@@ -25,7 +25,7 @@ export function NavbarLinks() {
               text-sm
               uppercase
               tracking-[0.12em]
-              text-white/60
+              text-[var(--text-secondary)]
               transition-colors
               duration-300
               hover:text-white
@@ -46,8 +46,8 @@ export function NavbarLinks() {
                   h-[2px]
                   w-full
                   rounded-full
-                  bg-cyan-400
-                  shadow-[0_0_12px_rgba(34,211,238,0.8)]
+                  bg-violet-500
+                  shadow-[0_0_18px_rgba(139,92,246,0.55)]
                 "
                 transition={{
                   type: "spring",

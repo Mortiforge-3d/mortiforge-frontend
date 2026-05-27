@@ -1,14 +1,31 @@
 :root {
   /* Backgrounds */
-  --background: #050816;
-  --foreground: #ffffff;
+  --background: #0a0a0f;
+  --background-secondary: #111118;
+
+  /* Surface */
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-hover: rgba(255, 255, 255, 0.07);
+
+  /* Borders */
+  --border: rgba(255, 255, 255, 0.08);
+
+   /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.72);
+  --text-muted: rgba(255, 255, 255, 0.45);
 
   --card: #0b1120;
   --card-foreground: #ffffff;
 
   /* Brand */
-  --primary: #7c3aed;
-  --primary-foreground: #ffffff;
+  --primary: #8b5cf6;
+  --primary-light: #a855f7;
+  --primary-dark: #7c3aed;
+
+  /* Glow */
+  --glow-primary: rgba(139, 92, 246, 0.35);
+  --glow-secondary: rgba(168, 85, 247, 0.2);
 
   --secondary: #111827;
   --secondary-foreground: #ffffff;

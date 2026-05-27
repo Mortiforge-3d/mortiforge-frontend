@@ -4,12 +4,23 @@ import Link from "next/link";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { NAVBAR_LINKS } from "./navbar-data";
 
 export function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isOpen]);
 
   return (
     <>
@@ -47,17 +58,21 @@ export function MobileMenu() {
             transition={{ duration: 0.3 }}
             className="
               fixed
-              inset-0
-              z-[100]
-              flex
-              flex-col
-              bg-black/90
+              left-0
+              top-0
+              z-50
+              h-screen
+              w-full
+              px-6
+              pt-28
+              pb-10
+              overflow-y-auto
+              bg-[#07070ae6]
               backdrop-blur-2xl
             "
           >
             {/* Top Bar */}
             <div className="flex items-center justify-between p-6">
-              <h2 className="heading-font text-4xl uppercase">Mortiforge</h2>
 
               <button
                 onClick={() => setIsOpen(false)}
@@ -115,7 +130,7 @@ export function MobileMenu() {
                       text-white/80
                       transition-all
                       duration-300
-                      hover:text-cyan-400
+                      hover:text-voilet-500
                     "
                   >
                     {link.label}

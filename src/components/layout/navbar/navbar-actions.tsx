@@ -22,9 +22,9 @@ export function NavbarActions() {
           backdrop-blur-xl
           transition-all
           duration-300
-          hover:border-cyan-400/30
-          hover:bg-cyan-400/10
-          hover:shadow-[0_0_30px_rgba(34,211,238,0.15)]
+          hover:border-violet-400/30
+          hover:bg-violet-400/10
+          hover:shadow-[0_0_30px_rgba(139,92,246,0.2)]
         "
       >
         <ShoppingBag size={18} />
@@ -41,7 +41,7 @@ export function NavbarActions() {
             items-center
             justify-center
             rounded-full
-            bg-cyan-400
+            bg-violet-500
             text-[10px]
             font-bold
             text-black
