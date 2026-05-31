@@ -64,7 +64,7 @@ export function Navbar() {
                     `
                     : `
                         h-[72px]
-                        border-[var(--border)]
+                        border-white
                         bg-[var(--surface)]
                     `
                 }

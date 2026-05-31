@@ -7,6 +7,8 @@ interface SectionProps {
 
 export function Section({ children, className }: SectionProps) {
   return (
-    <section className={cn("py-16 md:py-24", className)}>{children}</section>
+    <section className={cn("relative pt-24 md:pt-32", className)}>
+      {children}
+    </section>
   );
 }

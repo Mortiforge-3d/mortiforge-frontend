@@ -45,6 +45,7 @@ export function NavbarActions() {
             text-[10px]
             font-bold
             text-black
+            body-font
           "
         >
           0
@@ -72,6 +73,7 @@ export function NavbarActions() {
           hover:bg-white/10
           hover:text-white
           md:flex
+          body-font
         "
       >
         <User size={16} className="mr-2" />

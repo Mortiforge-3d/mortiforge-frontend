@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { HERO_DATA } from "./hero-data";
+import { HeroStats } from "./hero-stats";
 import { motion } from "framer-motion";
 import { useEffect,useState } from "react";
 
@@ -112,11 +113,12 @@ export function HeroContent() {
       <p
         className="
           mt-8
-         mx-auto max-w-xl lg:mx-0
+          mx-auto max-w-xl lg:mx-0
           text-lg
           leading-relaxed
           text-white/80
           md:text-md
+          body-font
         "
       >
         {HERO_DATA.description}
@@ -167,6 +169,7 @@ export function HeroContent() {
         >
           {HERO_DATA.secondaryCta.label}
         </Link>
+        <HeroStats />
       </div>
     </motion.div>
   );

@@ -1,14 +1,15 @@
 import { Container } from "../../layout/container";
+import { Section } from "../../layout/section";
 
 import { HeroBackground } from "./hero-background";
 import { HeroVisual } from "./hero-visual";
 import { HeroContent } from "./hero-content";
+import { HeroMarquee } from "./hero-marquee";
 
 export function HeroSection() {
   return (
-    <section
+    <Section
       className="
-        relative
         overflow-hidden
         min-h-screen pt-32 pb-16 md:pt-40 md:pb-24
       "
@@ -22,6 +23,7 @@ export function HeroSection() {
     bg-[size:80px_80px]
   "
       />
+
       <Container>
         <div
           className="
@@ -38,6 +40,7 @@ export function HeroSection() {
           <HeroVisual />
         </div>
       </Container>
-    </section>
+      <HeroMarquee />
+    </Section>
   );
 }

@@ -25,6 +25,7 @@ export function NavbarLogo() {
           src="/logo/logo.png"
           alt="Mortiforge Logo"
           fill
+          sizes="44px"
           className="object-cover"
         />
       </div>
