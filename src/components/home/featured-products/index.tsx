@@ -4,6 +4,7 @@ import { SectionHeading } from "./section-heading";
 import { Container } from "../../layout/container";
 import { Section } from "../../layout/section";
 
+import { Reveal } from "../../animations/reveal";
 
 export function FeaturedProducts() {
   return (
@@ -24,8 +25,10 @@ export function FeaturedProducts() {
             xl:grid-cols-3
           "
         >
-          {FEATURED_PRODUCTS.map((product) => (
-            <ProductCard key={product.id} {...product} />
+          {FEATURED_PRODUCTS.map((product,index) => (
+            <Reveal key={product.id} delay={index * 0.1}>
+              <ProductCard {...product} />
+            </Reveal>
           ))}
         </div>
       </Container>
