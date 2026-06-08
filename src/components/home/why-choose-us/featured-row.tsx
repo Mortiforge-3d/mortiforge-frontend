@@ -26,7 +26,7 @@ export function FeatureRow({ number, title, description }: FeatureRowProps) {
         className="
           heading-font
           text-4xl
-          text-primary/30
+          text-primary/50
           transition-all
           duration-300
           group-hover:text-primary

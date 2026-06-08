@@ -44,7 +44,7 @@ export function NavbarLogo() {
       >
         <span className="text-white">Mortiforge</span>
 
-        <span className="ml-1 text-violet-400">3D</span>
+        <span className="ml-1 text-primary">3D</span>
       </div>
     </Link>
   );

@@ -19,7 +19,7 @@ export function HowItWorks() {
               text-sm
               uppercase
               tracking-[0.3em]
-              text-violet-300
+              text-primary
             "
             >
               How It Works

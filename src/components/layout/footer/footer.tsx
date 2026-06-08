@@ -73,7 +73,7 @@ export function Footer() {
                 text-sm
                 uppercase
                 tracking-[0.2em]
-                text-violet-300
+                text-primary
                 body-font
               "
             >
@@ -87,7 +87,7 @@ export function Footer() {
                   className="
                     text-muted-foreground
                     transition-colors
-                    hover:text-violet-300
+                    hover:text-primary
                     body-font
                 "
                 >
@@ -100,7 +100,7 @@ export function Footer() {
                   className="
                     text-muted-foreground
                     transition-colors
-                    hover:text-violet-300
+                    hover:text-primary
                     body-font
                 "
                 >
@@ -113,7 +113,7 @@ export function Footer() {
                   className="
                     text-muted-foreground
                     transition-colors
-                    hover:text-violet-300
+                    hover:text-primary
                     body-font
                 "
                 >
@@ -126,7 +126,7 @@ export function Footer() {
                   className="
                     text-muted-foreground
                     transition-colors
-                    hover:text-violet-300
+                    hover:text-primary
                     body-font
                 "
                 >
@@ -143,7 +143,7 @@ export function Footer() {
                 text-sm
                 uppercase
                 tracking-[0.2em]
-                text-violet-300
+                text-primary
                 body-font
               "
             >
@@ -157,7 +157,7 @@ export function Footer() {
                   className="
                     text-muted-foreground
                     transition-colors
-                    hover:text-violet-300
+                    hover:text-primary
                     body-font
                 "
                 >
@@ -170,7 +170,7 @@ export function Footer() {
                   className="
                     text-muted-foreground
                     transition-colors
-                    hover:text-violet-300
+                    hover:text-primary
                     body-font
                 "
                 >
@@ -183,7 +183,7 @@ export function Footer() {
                   className="
                     text-muted-foreground
                     transition-colors
-                    hover:text-violet-300
+                    hover:text-primary
                     body-font
                 "
                 >

@@ -51,7 +51,7 @@ export function HeroMarquee() {
               {item}
             </span>
 
-            <span className="text-violet-400">✦</span>
+            <span className="text-violet-500">✦</span>
           </div>
         ))}
       </div>

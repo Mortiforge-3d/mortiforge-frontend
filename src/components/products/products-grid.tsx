@@ -1,16 +1,13 @@
+import { Container } from "../../components/layout/container";
 import { PRODUCTS } from "./data";
-import { ProductCard } from "../home/featured-products/product-card";
-import { Container } from "../layout/container";
-import { Reveal } from "../animations/reveal";
+import { ProductCard } from "./product-card";
 
 export function ProductsGrid() {
   return (
-    <Container>
-      <div className="mt-16 grid gap-8 md:grid-cols-2 xl:grid-cols-3">
-        {PRODUCTS.map((product, index) => (
-          <Reveal key={product.id} delay={index * 0.08}>
-            <ProductCard {...product}/>
-          </Reveal>
+      <Container>
+      <div className="mt-16 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+        {PRODUCTS.map((product) => (
+          <ProductCard key={product.id} {...product} />
         ))}
       </div>
     </Container>

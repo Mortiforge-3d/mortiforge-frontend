@@ -5,7 +5,7 @@ const categories = ["All", "Figures", "Decor", "Props", "Custom"];
 export function ProductsFilter() {
   return (
     <Container>
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap justify-center gap-3 mt-8">
         {categories.map((category) => (
           <button
             key={category}

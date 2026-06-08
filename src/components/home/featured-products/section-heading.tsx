@@ -21,7 +21,7 @@ export function SectionHeading({
           text-sm
           uppercase
           tracking-[0.3em]
-          text-violet-300
+          text-primary
         "
         >
           {eyebrow}

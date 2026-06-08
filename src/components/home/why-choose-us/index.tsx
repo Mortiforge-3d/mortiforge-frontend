@@ -18,7 +18,7 @@ export function WhyChooseUs() {
               text-sm
               uppercase
               tracking-[0.3em]
-              text-violet-300
+              text-primary
             "
             >
               Why Choose Mortiforge

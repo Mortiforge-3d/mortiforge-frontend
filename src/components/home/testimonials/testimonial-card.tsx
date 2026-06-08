@@ -20,7 +20,7 @@ export function TestimonialCard({ quote, author }: TestimonialCardProps) {
         p-8
         transition-all
         duration-300
-        hover:border-primary/30
+        hover:border-primary/50
       "
     >
       {/* Quote mark */}
@@ -42,7 +42,7 @@ export function TestimonialCard({ quote, author }: TestimonialCardProps) {
           mt-6
           text-xl
           leading-relaxed
-          text-violet-300
+          text-primary
         "
       >
         {quote}

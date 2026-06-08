@@ -3,7 +3,7 @@ import { Container } from "../layout/container";
 export function Pagination() {
   return (
     <Container>
-      <div className="mt-20 flex items-center justify-center gap-4">
+      <div className="mt-20 mb-20 flex items-center justify-center gap-4 body-font">
         <button className="text-muted-foreground hover:text-primary">
           ← Previous
         </button>

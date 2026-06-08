@@ -44,13 +44,13 @@ export function HeroContent() {
     gap-3
     rounded-full
     border
-    border-violet-400/50
+    border-primary
     px-5
     py-2.5
     text-sm
     uppercase
     tracking-[0.2em]
-    text-violet-200
+    text-primary
     backdrop-blur-xl
   "
       >
@@ -65,7 +65,7 @@ export function HeroContent() {
         w-full
         animate-ping
         rounded-full
-        bg-violet-400
+        bg-violet-500
         opacity-75
       "
           />
@@ -78,7 +78,7 @@ export function HeroContent() {
         h-3
         w-3
         rounded-full
-        bg-violet-400
+        bg-violet-500
         shadow-[0_0_12px_rgba(168,85,247,0.9)]
       "
           />
@@ -104,7 +104,7 @@ export function HeroContent() {
       >
         <span className="text-white">Forge</span>
 
-        <span className=" text-violet-400">The Future</span>
+        <span className=" text-primary">The Future</span>
 
         <span className="text-white">In 3D</span>
       </h1>
@@ -130,7 +130,7 @@ export function HeroContent() {
           href={HERO_DATA.primaryCta.href}
           className="
             rounded-full
-            bg-[var(--primary-light)]
+            bg-primary
             px-8
             py-4
             text-sm

@@ -7,11 +7,11 @@ import {
 
 export default function ProductsPage() {
     return (
-        <>
-            <ProductsHero />
-            <ProductsFilter />
-            <ProductsGrid />
-            <Pagination />
-        </>
+      <>
+        <ProductsHero />
+        <ProductsFilter />
+        <ProductsGrid />
+        <Pagination />
+      </>
     );
 }

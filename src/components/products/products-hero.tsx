@@ -4,11 +4,35 @@ import { Reveal } from "../animations/reveal";
 
 export function ProductsHero() {
     return (
-      <Section>
+      <Section className="overflow-hidden">
+        <div
+          className="
+    absolute
+    inset-0
+    bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)]
+    bg-[size:80px_80px]
+  "
+        />
+
         <Container>
+          <div
+            className="
+                absolute
+                left-1/2
+                top-2/2
+                h-[600px]
+                w-[600px]
+                -translate-x-1/2
+                -translate-y-1/2
+                rounded-full
+                bg-primary/10
+                blur-[180px]
+                pointer-events-none
+                "
+          />
           <Reveal>
-            <div className="max-w-4xl">
-              <p className="text-sm uppercase tracking-[0.3em] text-primary">
+            <div className="mb-6 mt-3">
+              <p className="text-md uppercase tracking-[0.3em] text-primary">
                 Products
               </p>
 
@@ -20,7 +44,7 @@ export function ProductsHero() {
                 uppercase
                 leading-[0.9]
                 text-white
-                md:text-7xl
+                md:text-8xl
               "
               >
                 Explore Our
@@ -34,6 +58,7 @@ export function ProductsHero() {
                 max-w-xl
                 text-lg
                 text-muted-foreground
+                body-font
               "
               >
                 Discover premium 3D printed creations, collectibles, decor

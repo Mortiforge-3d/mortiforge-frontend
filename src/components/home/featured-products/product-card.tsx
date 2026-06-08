@@ -125,40 +125,36 @@ export function ProductCard({
               w-fit
               rounded-full
               border
-              border-violet-500/20
+              border-violet-500/50
               px-3
               py-1
               text-xs
               uppercase
               tracking-[0.2em]
-              text-violet-300
+              text-primary
               mt-3
             "
         >
           {category}
         </span>
-
         {/* Title */}
         <h3 className="heading-font mt-8 text-5xl uppercase leading-[0.9] tracking-wide text-white/80">
           {name.split(" ").slice(0, -1).join(" ")}
           <br />
           {name.split(" ").slice(-1)}
         </h3>
-
-        {/* Description */}
         <p
           className="
-            mt-2
-            max-w-sm
+            mt-3
+            line-clamp-2
+            min-h-[48px]
             text-sm
-            leading-relaxed
-            text-violet-300
+            text-muted-foreground
             body-font
           "
         >
           {description}
         </p>
-
         {/* Price */}
         <div className="mt-auto flex items-end justify-between pt-8">
           <div>
@@ -166,10 +162,10 @@ export function ProductCard({
               Starting at
             </p>
 
-            <p className="mt-1 heading-font text-3xl text-violet-300">{price}</p>
+            <p className="mt-1 heading-font text-3xl text-primary">{price}</p>
           </div>
 
-          <span className="text-white/30 body-font">→</span>
+          <span className="text-primary body-font">→</span>
         </div>
       </div>
     </motion.div>
