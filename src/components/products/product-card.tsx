@@ -5,8 +5,8 @@ interface ProductCardProps {
   slug: string;
   title: string;
   category: string;
-  image: string;
-  materials: string[];
+  images: string[];
+  materials: string;
   price: number;
 }
 
@@ -14,11 +14,11 @@ export function ProductCard({
   slug,
   title,
   category,
-  image,
+  images,
   materials,
   price,
 }: ProductCardProps) {
-    return (
+  return (
     <Link
       href={`/products/${slug}`}
       className="
@@ -49,18 +49,19 @@ export function ProductCard({
   "
       >
         <Image
-          src={image || "/products/placeholder.jpg"}
+          src={images[0] || "/products/placeholder.jpg"}
           alt={title}
           fill
+          sizes="(max-width: 768px) 100vw,
+    (max-width: 1280px) 50vw,
+    33vw"
           className="
     object-cover
     transition-transform
     duration-700
     group-hover:scale-110
   "
-          sizes="(max-width:768px) 100vw, 33vw"
         />
-        
       </div>
 
       {/* Content */}
@@ -89,10 +90,9 @@ export function ProductCard({
         </h3>
 
         <div className="mt-3 flex flex-wrap gap-2">
-          {materials.map((material) => (
-            <span
-              key={material}
-              className="
+          <span
+            key={materials}
+            className="
                 rounded-full
                 border
                 border-border
@@ -102,15 +102,16 @@ export function ProductCard({
                 text-xs
                 text-muted-foreground
               "
-            >
-              {material}
-            </span>
-          ))}
+          >
+            {materials}
+          </span>
         </div>
 
         <div className="mt-auto pt-5">
           <div className="flex items-center justify-between">
-            <p className="text-2xl body-font text-primary font-semibold">₹{price}</p>
+            <p className="text-2xl body-font text-primary font-semibold">
+              ₹{price}
+            </p>
 
             <span
               className="

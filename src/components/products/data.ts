@@ -4,9 +4,15 @@ export const PRODUCTS = [
     slug: "cyber-skull",
     title: "Cyber Skull",
     category: "Decor",
-    image: "/products/lamp.jpeg",
-    materials: ["PLA", "Resin"],
+    images: [
+      "/products/penstand.jpeg",
+      "/products/penstand.jpeg",
+      "/products/penstand.jpeg",
+    ],
+    dimensions: "15cm × 15cm × 20cm",
+    materials: "PLA",
     price: 1499,
+    color: "red",
   },
 
   {
@@ -14,9 +20,15 @@ export const PRODUCTS = [
     slug: "robot-bust",
     title: "Robot Bust",
     category: "Figures",
-    image: "/products/penstand.jpeg",
-    materials: ["PLA+"],
+    images: [
+      "/products/penstand.jpeg",
+      "/products/penstand.jpeg",
+      "/products/penstand.jpeg",
+    ],
+    dimensions: "15cm × 15cm × 20cm",
+    materials: "PLA+",
     price: 1799,
+    color: "red",
   },
 
   {
@@ -24,9 +36,15 @@ export const PRODUCTS = [
     slug: "dragon-model",
     title: "Dragon Model",
     category: "Figures",
-    image: "/products/lamp.jpeg",
-    materials: ["Resin"],
+    images: [
+      "/products/penstand.jpeg",
+      "/products/penstand.jpeg",
+      "/products/penstand.jpeg",
+    ],
+    dimensions: "15cm × 15cm × 20cm",
+    materials: "Resin",
     price: 2299,
+    color: "red",
   },
 
   {
@@ -34,9 +52,15 @@ export const PRODUCTS = [
     slug: "mech-core",
     title: "Mech Core",
     category: "Props",
-    image: "/products/penstand.jpeg",
-    materials: ["PLA", "PETG"],
+    images: [
+      "/products/penstand.jpeg",
+      "/products/penstand.jpeg",
+      "/products/penstand.jpeg",
+    ],
+    dimensions: "15cm × 15cm × 20cm",
+    materials: "PLA",
     price: 1999,
+    color: "red",
   },
 
   {
@@ -44,9 +68,15 @@ export const PRODUCTS = [
     slug: "space-helmet",
     title: "Space Helmet",
     category: "Props",
-    image: "/products/lamp.jpeg",
-    materials: ["PLA+"],
+    images: [
+      "/products/penstand.jpeg",
+      "/products/penstand.jpeg",
+      "/products/penstand.jpeg",
+    ],
+    dimensions: "15cm × 15cm × 20cm",
+    materials: "PLA+",
     price: 3499,
+    color: "red",
   },
 
   {
@@ -54,8 +84,14 @@ export const PRODUCTS = [
     slug: "samurai-mask",
     title: "Samurai Mask",
     category: "Decor",
-    image: "/products/penstand.jpeg",
-    materials: ["PLA", "PETG"],
+    images: [
+      "/products/penstand.jpeg",
+      "/products/penstand.jpeg",
+      "/products/penstand.jpeg",
+    ],
+    dimensions: "15cm × 15cm × 20cm",
+    materials: "PLA",
     price: 2499,
+    color: "red",
   },
 ];

@@ -7,32 +7,33 @@ export function Footer() {
     <footer className="relative overflow-hidden border-t border-border py-24">
       <div
         className="
-    absolute
-    left-0
-    top-1/2
-    -translate-y-1/2
-    pointer-events-none
+        absolute
+        top-1/2
+        left-0
+        -translate-y-1/2
+        pointer-events-none
   "
       >
         <div
           className="
-      absolute
-      inset-0
-      bg-primary/20
-      blur-[120px]
+          inset-0
+          absolute
+          blur-[120px]
+          bg-primary/20
     "
         />
         <div
           className="
-      relative
-      h-[500px]
-      w-[500px]
-      opacity-[0.1]
+          h-[500px]
+          relative
+          opacity-[0.1]
+          w-[500px]
     "
         >
           <Image
             src="/logo/logo-nobg.png"
             alt="Mortiforge"
+            sizes=""
             fill
             className="object-contain"
           />
