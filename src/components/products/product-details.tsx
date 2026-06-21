@@ -1,100 +1,79 @@
+"use client";
+
 import Image from "next/image";
 import { Section } from "../layout/section";
 import { Container } from "../layout/container";
+import { useState } from "react";
 
 interface ProductDetailsProps {
   product: {
     title: string;
     category: string;
     price: number;
-    images: string[];
+    variants: {
+      color: string;
+      hex: string;
+      images: string[];
+    }[];
     materials: string;
-    color: string;
     dimensions: string;
   };
 }
 
 export function ProductDetails({ product }: ProductDetailsProps) {
+  const [selectedColor, setSelectedColor] = useState(product.variants[0].color);
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+  const [customText, setCustomText] = useState("");
+
+  const selectedVariant = product.variants.find(
+    (variants) => variants.color === selectedColor,
+  )!;
   return (
     <Section>
       <Container>
-        <div className="grid items-start gap-16 md:grid-cols-2">
-          <div className="space-y-4">
+        <div className="grid items-start gap-8 md:grid-cols-2">
+          <div className="flex gap-4">
+            {/* Thumbnails */}
+
+            <div className="flex flex-col gap-6">
+              {selectedVariant.images.map((image, index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedImage(index)}
+                  className={`
+                    overflow-hidden
+        rounded-sm
+        border
+        border-border
+        transition-all
+        hover:border-primary
+        ${selectedImage === index ? "border-primary" : "border-border"}
+        
+      `}
+                >
+                  <Image src={image} alt="" width={50} height={50} />
+                </button>
+              ))}
+            </div>
+
+            {/* Main Image */}
             <div
               className="
-    absolute
-    left-1/2
-    top-1/2
-    h-72
-    w-72
-    -translate-x-1/2
-    -translate-y-1/2
-    rounded-full
-    bg-primary/15
-    blur-3xl
+    flex
+    justify-center
+    overflow-hidden
+    rounded-md
+    border
+    border-primary/20
+    bg-card
   "
-            />
-            {/* Image */}
-            <div
-              className="
-relative
-h-[520px]
-overflow-hidden
-rounded-[32px]
-border
-border-primary/20
-bg-card/40
-backdrop-blur-sm
-"
             >
               <Image
-                src={product.images[0]}
+                src={selectedVariant.images[selectedImage]}
                 alt={product.title}
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="
-object-contain
-p-6
-transition-transform
-duration-500
-group-hover:scale-105
-"
-              />
-            </div>
-            <div className="flex gap-4">
-              <div
-                className="
-    h-24
-    w-24
-    rounded-2xl
-    border
-    border-primary
-    bg-card/40
-  "
-              />
-              <div
-                className="
-    h-24
-    w-24
-    rounded-2xl
-    border
-    border-border
-    bg-card/40
-    transition-all
-    hover:border-primary
-  "
-              />
-              <div
-                className="
-    h-24
-    w-24
-    rounded-2xl
-    border
-    border-border
-    bg-card/40
-    transition-all
-    hover:border-primary
-  "
+                width={450}
+                height={450}
               />
             </div>
           </div>
@@ -104,11 +83,12 @@ group-hover:scale-105
             {/* Category */}
             <p
               className="
-      text-xs
-uppercase
-tracking-[0.4em]
-font-medium
-    "
+    text-sm
+    uppercase
+    tracking-[0.4em]
+    text-primary
+    body-font
+  "
             >
               {product.category}
             </p>
@@ -116,14 +96,13 @@ font-medium
             {/* Product Name */}
             <h1
               className="
-      heading-font
-      mt-4
-      text-4xl
-      uppercase
-      leading-[0.9]
-      md:text-6xl
-      max-w-[12ch]
-    "
+    heading-font
+    mt-3
+    text-4xl
+    md:text-5xl
+    uppercase
+    leading-none
+  "
             >
               {product.title}
             </h1>
@@ -131,11 +110,12 @@ font-medium
             {/* Price */}
             <p
               className="
-      mt-6
-      text-4xl
-      font-bold
-      text-primary
-    "
+    mt-6
+    text-4xl
+    font-bold
+    text-primary
+    body-font
+  "
             >
               ₹{product.price}
             </p>
@@ -143,97 +123,203 @@ font-medium
             {/* Specifications */}
             <div
               className="
-      mt-8
-      rounded-3xl
-      border
-      border-border
-      bg-card/30
-      backdrop-blur-sm
-      divide-y divide-border
-      p-6
-    "
+    mt-8
+    rounded-lg
+    border
+    
+    bg-card
+    p-4
+  "
             >
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Material</span>
+              <div className="grid gap-6 body-font">
+                <div className="flex justify-between">
+                  <span>Material</span>
 
-                <span>{product.materials}</span>
-              </div>
+                  <span>{product.materials}</span>
+                </div>
 
-              <div className="mt-4 flex justify-between">
-                <span className="text-muted-foreground">Color</span>
+                <div className="flex justify-between">
+                  <span>Color</span>
 
-                <span>{product.color}</span>
-              </div>
+                  <span>{selectedColor}</span>
+                </div>
 
-              <div className="mt-4 flex justify-between">
-                <span className="text-muted-foreground">Dimensions</span>
+                <div className="flex justify-between">
+                  <span>Dimensions</span>
 
-                <span>{product.dimensions}</span>
+                  <span>{product.dimensions}</span>
+                </div>
               </div>
             </div>
 
-            {/* Quantity */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              {/* Quantity */}
+              <div className="mt-8 body-font">
+                <p className="mb-4 text-sm uppercase text-primary  tracking-[0.15em]">
+                  Quantity
+                </p>
+
+                <div
+                  className="
+      flex
+      w-fit
+      items-center
+      gap-8
+      rounded-full
+      border
+      border-border
+      px-8
+      py-3
+    "
+                >
+                  <button
+                    onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                  >
+                    -
+                  </button>
+                  <span>{quantity}</span>
+                  <button onClick={() => setQuantity((prev) => prev + 1)}>
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* colors */}
+
+              <div className="mt-8 space-y-3 lg:justify-self-end">
+                <p
+                  className="
+      text-sm
+      uppercase
+      tracking-[0.15em]
+      text-primary
+      body-font
+      mb-5
+    "
+                >
+                  Color
+                </p>
+
+                <div className="flex gap-3">
+                  {product.variants.map((variant) => (
+                    <button
+                      key={variant.color}
+                      onClick={() => {
+                        setSelectedColor(variant.color);
+                        setSelectedImage(0);
+                      }}
+                      style={{
+                        backgroundColor: variant.hex,
+                      }}
+                      className={`
+          h-10
+          w-10
+          rounded-full
+          border-2
+          transition-all
+          ${
+            selectedColor === variant.color
+              ? "border-primary scale-110"
+              : "border-border"
+          }
+        `}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
             <div className="mt-8">
-              <p className="mb-3 text-sm uppercase tracking-wider text-muted-foreground">
-                Quantity
+              <p
+                className="
+      text-sm
+      uppercase
+      tracking-[0.15em]
+      text-primary
+      body-font
+    "
+              >
+                Custom Engraving
               </p>
 
-              <div
+              <p
                 className="
-        flex
-        w-fit
-        items-center
-        gap-8
-        rounded-full
-        border
-        border-border
-        px-8
-        py-3
-      "
+      mt-2
+      text-sm
+      text-muted-foreground
+      body-font
+    "
               >
-                <button
-                  className="text-xl 
-                            font-semibold"
-                >
-                  -
-                </button>
+                Add a name, quote, or short message to personalize your print.
+                Additional charges may apply. Leave blank if not required.
+              </p>
 
-                <span>1</span>
+              <textarea
+                value={customText}
+                onChange={(e) => setCustomText(e.target.value)}
+                maxLength={25}
+                placeholder="Enter text here..."
+                className="
+      mt-4
+      min-h-[120px]
+      w-full
+      rounded-lg
+      border
+      border-border
+      bg-card
+      p-4
+      body-font
+      outline-none
+      transition-colors
+      focus:border-primary
+    "
+              />
 
-                <button>+</button>
-              </div>
+              <p
+                className="
+      mt-2
+      text-xs
+      text-muted-foreground
+      text-right
+    "
+              >
+                {customText.length}/25 characters
+              </p>
             </div>
 
             {/* Actions */}
-            <div className="mt-8 flex gap-4">
+            <div className="mt-10 flex gap-4">
               <button
                 className="
-flex-1
-rounded-full
-bg-primary
-px-8
-py-4
-font-semibold
-text-black
-transition-all
-hover:scale-[1.02]
-"
+      flex-1
+      rounded-full
+      bg-primary
+      px-8
+      py-4
+      font-semibold
+      text-black
+      transition-all
+      hover:scale-[1.02]
+      body-font
+    "
               >
                 Add To Cart
               </button>
 
               <button
                 className="
-flex-1
-rounded-full
-border
-border-primary
-px-8
-py-4
-font-semibold
-transition-all
-hover:bg-primary/10
-"
+      flex-1
+      rounded-full
+      border
+      border-primary
+      px-8
+      py-4
+      font-semibold
+      transition-all
+      hover:bg-primary/10
+      bg-card
+      body-font
+    "
               >
                 Buy Now
               </button>

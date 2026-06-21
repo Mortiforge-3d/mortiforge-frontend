@@ -5,7 +5,10 @@ interface ProductCardProps {
   slug: string;
   title: string;
   category: string;
-  images: string[];
+  variants: {
+    color: string,
+    images: string[],
+  }[];
   materials: string;
   price: number;
 }
@@ -14,7 +17,7 @@ export function ProductCard({
   slug,
   title,
   category,
-  images,
+  variants,
   materials,
   price,
 }: ProductCardProps) {
@@ -49,7 +52,7 @@ export function ProductCard({
   "
       >
         <Image
-          src={images[0] || "/products/placeholder.jpg"}
+          src={variants[0].images[0] || "/products/placeholder.jpg"}
           alt={title}
           fill
           sizes="(max-width: 768px) 100vw,
@@ -119,6 +122,7 @@ export function ProductCard({
                 transition-transform
                 duration-300
                 body-font
+                text-2xl
               "
             >
               →
