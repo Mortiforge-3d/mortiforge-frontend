@@ -20,7 +20,7 @@ export function FeaturedProducts() {
           className="
             mt-16
             grid
-            gap-6
+            gap-4
             md:grid-cols-2
             xl:grid-cols-3
           "

@@ -13,7 +13,7 @@ export function TestimonialCard({ quote, author }: TestimonialCardProps) {
         min-h-[320px]
         flex-col
         justify-between
-        rounded-xl
+        rounded-md
         border
         border-border
         bg-surface

@@ -1,7 +1,7 @@
 export const NAVBAR_LINKS = [
   {
     label: "Shop",
-    href: "/shop",
+    href: "/products",
   },
   {
     label: "Custom Print",

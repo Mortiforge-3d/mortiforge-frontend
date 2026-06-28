@@ -8,7 +8,7 @@ export const HERO_DATA = {
 
   primaryCta: {
     label: "Explore Products",
-    href: "/shop",
+    href: "/products",
   },
 
   secondaryCta: {

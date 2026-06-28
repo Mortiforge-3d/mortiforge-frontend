@@ -56,7 +56,7 @@ export function Testimonials() {
           className="
             mt-20
             grid
-            gap-8
+            gap-4
             md:grid-cols-2
             xl:grid-cols-3
           "

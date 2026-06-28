@@ -36,7 +36,7 @@ export function ProductCard({
         border-white/5
         bg-[#08080c]
         p-5
-        rounded-sm
+        rounded-md
       "
     >
       {/* Background Glow */}

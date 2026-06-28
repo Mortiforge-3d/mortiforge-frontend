@@ -29,7 +29,7 @@ export function ProductCard({
         flex
         flex-col
         overflow-hidden
-        rounded-[5px]
+        rounded-md
         border
         border-border
         bg-card/50
