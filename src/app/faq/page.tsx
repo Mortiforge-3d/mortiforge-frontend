@@ -1,3 +1,15 @@
-export default function FaqPage() {
-    return <div>FAQ Page</div>;
+import {
+    FAQHero,
+    FAQList,
+    FAQCTA
+} from "../../components/faq";
+
+export default function FAQPage() {
+    return (
+        <>
+            <FAQHero />
+            <FAQList />
+            <FAQCTA/>
+        </>
+    );
 }
