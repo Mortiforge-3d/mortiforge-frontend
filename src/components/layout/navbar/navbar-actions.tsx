@@ -1,12 +1,26 @@
-import Link from "next/link";
+"use client";
 
+import Link from "next/link";
 import { ShoppingBag, User } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import { useCartStore } from "@/src/store/cart-store";
 
 export function NavbarActions() {
+  const totalItems = useCartStore((state) => state.getTotalItems());
+
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
   return (
     <div className="flex items-center gap-3">
       {/* Cart Button */}
-      <button
+
+      <Link
+        href="/cart"
         className="
           relative
           flex
@@ -30,11 +44,12 @@ export function NavbarActions() {
         <ShoppingBag size={18} />
 
         {/* Cart Count */}
+
         <span
           className="
             absolute
-            -top-1
             -right-1
+            -top-1
             flex
             h-5
             w-5
@@ -48,11 +63,12 @@ export function NavbarActions() {
             body-font
           "
         >
-          0
+          {hydrated ? totalItems : 0}
         </span>
-      </button>
+      </Link>
 
       {/* Account Button */}
+
       <Link
         href="/login"
         className="

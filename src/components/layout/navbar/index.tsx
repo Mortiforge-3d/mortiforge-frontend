@@ -58,13 +58,11 @@ export function Navbar() {
                   scrolled
                     ? `
                         h-16
-                        border-white/15
                         bg-[#0a0a0fcc]
                         shadow-[0_10px_40px_rgba(0,0,0,0.45)]
                     `
                     : `
                         h-[72px]
-                        border-white
                         bg-[var(--surface)]
                     `
                 }

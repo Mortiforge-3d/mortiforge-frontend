@@ -151,11 +151,11 @@ export default function CustomPrintForm() {
 
   <Field label="Project Type" required>
     <Select name="projectType">
-      <SelectTrigger>
+      <SelectTrigger className="w-full bg-white/5">
         <SelectValue placeholder="Select project type" />
       </SelectTrigger>
 
-      <SelectContent>
+      <SelectContent className="bg-[#111118]">
         <SelectItem value="prototype">Prototype</SelectItem>
         <SelectItem value="miniature">Miniature</SelectItem>
         <SelectItem value="decor">Decor</SelectItem>

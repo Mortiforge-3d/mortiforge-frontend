@@ -4,7 +4,7 @@ import { Reveal } from "../animations/reveal";
 
 export function ProductsHero() {
     return (
-      <Section className="relative min-h-[100svh] overflow-hidden">
+      <Section className="relative flex min-h-[100svh] items-center overflow-hidden">
         <div
           className="
     absolute
@@ -14,7 +14,7 @@ export function ProductsHero() {
     z-10
   "
         />
-        <Container className="flex mt-5  items-center justify-center">
+        <Container className="flex w-full items-center justify-center">
           {/* Glow */}
           <div
             className="

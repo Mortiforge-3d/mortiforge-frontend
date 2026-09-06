@@ -4,20 +4,11 @@ import Image from "next/image";
 import { Section } from "../layout/section";
 import { Container } from "../layout/container";
 import { useState } from "react";
+import { useCartStore } from "@/src/store/cart-store";
+import type { Product} from "@/src/components/products/data";
 
 interface ProductDetailsProps {
-  product: {
-    title: string;
-    category: string;
-    price: number;
-    variants: {
-      color: string;
-      hex: string;
-      images: string[];
-    }[];
-    materials: string;
-    dimensions: string;
-  };
+  product: Product;
 }
 
 export function ProductDetails({ product }: ProductDetailsProps) {
@@ -25,6 +16,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [customText, setCustomText] = useState("");
+  const addItem = useCartStore((state) => state.addItem);
 
   const selectedVariant = product.variants.find(
     (variants) => variants.color === selectedColor,
@@ -178,9 +170,17 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                     -
                   </button>
                   <span>{quantity}</span>
-                  <button onClick={() => setQuantity((prev) => prev + 1)}>
+                  {/* <button onClick={() => setQuantity((prev) => prev + 1)}>
                     +
-                  </button>
+                  </button> */}
+                  <button
+  onClick={() => {
+    console.log("PLUS CLICKED");
+    setQuantity((prev) => prev + 1);
+  }}
+>
+  +
+</button>
                 </div>
               </div>
 
@@ -290,6 +290,9 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             {/* Actions */}
             <div className="mt-10 flex gap-4">
               <button
+              onClick={() =>
+  addItem(product, selectedVariant, quantity, customText)
+}
                 className="
       flex-1
       rounded-full

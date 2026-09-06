@@ -29,7 +29,7 @@ export function ProductCard({
         group
         relative
         flex
-        min-h-[600px]
+          min-h-[460px]
         flex-col
         overflow-hidden
         border
@@ -71,7 +71,7 @@ export function ProductCard({
         className="
           relative
           flex
-          h-[300px]
+            h-[220px]
           items-center
           justify-center
         "
@@ -84,7 +84,7 @@ export function ProductCard({
             duration: 0.5,
           }}
           className="
-            relative
+                  text-[6rem]
             h-[140px]
             w-[140px]
           "
@@ -94,7 +94,7 @@ export function ProductCard({
               filter: "sepia(1) saturate(6) hue-rotate(240deg)",
             }}
             className="
-                text-[8rem]
+                text-[6rem]
                 transition-transform
                 duration-500
                 opacity-15
@@ -139,7 +139,7 @@ export function ProductCard({
         </span>
         {/* Title */}
         <h3 className="heading-font mt-8 text-5xl uppercase leading-[0.9] tracking-wide text-white/80">
-          {name.split(" ").slice(0, -1).join(" ")}
+            {name.split(" ").slice(0, -1).join(" ")}
           <br />
           {name.split(" ").slice(-1)}
         </h3>

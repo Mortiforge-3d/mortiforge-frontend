@@ -6,7 +6,7 @@ import { Reveal } from "@/src/components/animations/reveal";
 
 export default function CustomPrintHero() {
   return (
-    <Section className="relative min-h-screen overflow-hidden pt-0">
+    <Section className="relative flex min-h-[100svh] items-center overflow-hidden pt-32 pb-16 md:pt-28">
       {/* Background Grid */}
       <div
         className="
@@ -36,9 +36,8 @@ export default function CustomPrintHero() {
         }}
       />
 
-      <Container className="relative z-10 flex min-h-screen items-center">
-        <div className="grid w-full items-center gap-20 lg:grid-cols-2">
-          {/* Left Content */}
+      <Container className="relative z-10 flex w-full items-center justify-center">
+        <div className="w-full max-w-4xl text-center">
           <Reveal>
             <div>
               <p
@@ -74,6 +73,7 @@ export default function CustomPrintHero() {
               <p
                 className="
                   mt-8
+                  mx-auto
                   max-w-xl
                   body-font
                   text-lg
@@ -87,7 +87,7 @@ export default function CustomPrintHero() {
                 way.
               </p>
 
-              <div className="mt-10 flex flex-wrap items-center gap-5">
+              <div className="mt-10 flex flex-wrap items-center justify-center gap-5">
                 <Link
                   href="#request-form"
                   className="
@@ -122,6 +122,7 @@ export default function CustomPrintHero() {
                   mt-14
                   flex
                   flex-wrap
+                  justify-center
                   gap-4
                   body-font
                   text-xs
@@ -147,80 +148,6 @@ export default function CustomPrintHero() {
                 <span>•</span>
 
                 <span>DELIVER</span>
-              </div>
-            </div>
-          </Reveal>
-
-          {/* Right Side */}
-          <Reveal delay={0.2}>
-            <div
-              className="
-                relative
-                mx-auto
-                aspect-square
-                w-full
-                max-w-[560px]
-              "
-            >
-              {/* Large Glow */}
-              <div
-                className="
-                  absolute
-                  left-1/2
-                  top-1/2
-                  h-64
-                  w-64
-                  -translate-x-1/2
-                  -translate-y-1/2
-                  rounded-full
-                  bg-primary/20
-                  blur-[120px]
-                "
-              />
-
-              {/* Placeholder */}
-
-              <div
-                className="
-                  flex
-                  h-full
-                  items-center
-                  justify-center
-                  rounded-3xl
-                  border
-                  border-dashed
-                  border-primary/20
-                  bg-card/40
-                  backdrop-blur-sm
-                "
-              >
-                <div className="text-center">
-                  <p
-                    className="
-                      heading-font
-                      text-5xl
-                      uppercase
-                      text-primary/40
-                    "
-                  >
-                    YOUR
-                    <br />
-                    VISUAL
-                  </p>
-
-                  <p
-                    className="
-                      mt-4
-                      body-font
-                      text-sm
-                      uppercase
-                      tracking-[0.3em]
-                      text-muted-foreground
-                    "
-                  >
-                    Printer • Model • Animation
-                  </p>
-                </div>
               </div>
             </div>
           </Reveal>

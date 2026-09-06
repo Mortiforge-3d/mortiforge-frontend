@@ -3,7 +3,7 @@ import { Section } from "../layout/section";
 
 export function FAQHero() {
     return (
-      <Section className="relative overflow-hidden min-h-screen ">
+      <Section className="relative flex min-h-[100svh] items-center overflow-hidden">
         {/* {Glow} */}
         <div
           className="absolute
@@ -29,8 +29,8 @@ export function FAQHero() {
             filter: "blur(180px)",
           }}
         />
-        <Container className="flex items-center justify-center">
-          <div className="relative z-10 mt-30 md:mt-6 mx-auto max-w-4xl text-center">
+        <Container className="flex w-full items-center justify-center">
+          <div className="relative z-10 mx-auto max-w-4xl text-center">
             <p
               className="
               mb-4

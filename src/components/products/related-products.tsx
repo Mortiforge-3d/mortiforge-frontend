@@ -9,13 +9,14 @@ interface RelatedProductsProps {
 
 export function RelatedProducts({ product }: RelatedProductsProps) {
   return (
-    <Section className=" overfolw-hidden mt-12 md:pt-16">
+    <Section className="relative overflow-hidden mt-12 md:pt-16">
       <div
         className="
     absolute
     inset-0
     bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)]
     bg-[size:80px_80px]
+    pointer-events-none
   "
       />
       <div
@@ -29,6 +30,7 @@ export function RelatedProducts({ product }: RelatedProductsProps) {
           rounded-full
           bg-violet-500/15
           blur-[100px]
+          pointer-events-none
         "
       />
 

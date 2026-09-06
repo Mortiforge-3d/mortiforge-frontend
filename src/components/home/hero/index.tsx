@@ -10,6 +10,7 @@ export function HeroSection() {
   return (
     <Section
       className="
+        relative
         overflow-hidden
         min-h-screen pt-32 pb-16 md:pt-40 md:pb-24
       "

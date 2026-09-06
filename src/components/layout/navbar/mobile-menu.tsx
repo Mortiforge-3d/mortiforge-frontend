@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, User, X } from "lucide-react";
 import { useState, useEffect } from "react";
 
 import { NAVBAR_LINKS } from "./navbar-data";
@@ -67,31 +67,32 @@ export function MobileMenu() {
               pt-28
               pb-10
               overflow-y-auto
-              bg-[#07070ae6]
-              backdrop-blur-2xl
+              bg-black
+              border
             "
           >
-            {/* Top Bar */}
-            <div className="flex items-center justify-between p-6">
-
-              <button
-                onClick={() => setIsOpen(false)}
-                className="
-                  flex
-                  h-11
-                  w-11
-                  items-center
-                  justify-center
-                  rounded-full
-                  border
-                  border-white/10
-                  bg-white/5
-                  text-white
-                "
-              >
-                <X size={20} />
-              </button>
-            </div>
+            {/* Close Button */}
+            <button
+              onClick={() => setIsOpen(false)}
+              aria-label="Close menu"
+              className="
+                absolute
+                right-6
+                top-6
+                flex
+                h-11
+                w-11
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-white/10
+                bg-white/5
+                text-white
+              "
+            >
+              <X size={20} />
+            </button>
 
             {/* Navigation */}
             <div
@@ -127,21 +128,50 @@ export function MobileMenu() {
                       text-5xl
                       uppercase
                       tracking-wide
-                      text-white/80
+                      text-violet-500/80
                       transition-all
                       duration-300
-                      hover:text-voilet-500
+                      hover:text-violet-500
                     "
                   >
                     {link.label}
                   </Link>
                 </motion.div>
               ))}
+
+              <Link
+                href="/login"
+                onClick={() => setIsOpen(false)}
+                className="
+                  mt-2
+                  flex
+                  items-center
+                  gap-2
+                  rounded-full
+                  border
+                  border-white/10
+                  bg-white/5
+                  px-6
+                  py-3
+                  body-font
+                  text-sm
+                  uppercase
+                  tracking-[0.15em]
+                  text-white/80
+                  transition-colors
+                  duration-300
+                  hover:border-violet-500/50
+                  hover:text-violet-500
+                "
+              >
+                <User size={16} />
+                Sign In
+              </Link>
             </div>
 
             {/* Footer */}
             <div className="p-8 text-center">
-              <p className="body-font text-sm text-white/40">
+              <p className="body-font text-sm text-white">
                 Premium futuristic 3D printing
               </p>
             </div>
