@@ -50,7 +50,7 @@ export default async function RequestDetailsPage({
 
             <div className="mt-12 grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
               {/* Status Timeline */}
-              <section className="rounded-3xl border border-border bg-card/40 p-6 backdrop-blur md:p-8">
+              <section className="rounded-lg border border-border bg-card/40 p-6 backdrop-blur md:p-8">
                 <p className="body-font text-xs uppercase tracking-[0.2em] text-primary">
                   PROJECT PROGRESS
                 </p>
@@ -96,7 +96,7 @@ export default async function RequestDetailsPage({
 
               {/* Request Information */}
               <div className="space-y-8">
-                <section className="rounded-3xl border border-border bg-card/40 p-6 backdrop-blur md:p-8">
+                <section className="rounded-lg border border-border bg-card/40 p-6 backdrop-blur md:p-8">
                   <p className="body-font text-xs uppercase tracking-[0.2em] text-primary">
                     REQUEST DETAILS
                   </p>
@@ -136,7 +136,7 @@ export default async function RequestDetailsPage({
                   </div>
                 </section>
 
-                <section className="rounded-3xl border border-border bg-card/40 p-6 backdrop-blur md:p-8">
+                <section className="rounded-lg border border-border bg-card/40 p-6 backdrop-blur md:p-8">
                   <p className="body-font text-xs uppercase tracking-[0.2em] text-primary">
                     QUOTE
                   </p>

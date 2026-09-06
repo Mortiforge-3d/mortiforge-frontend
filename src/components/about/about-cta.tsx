@@ -44,7 +44,7 @@ export function AboutCTA() {
               text-primary
             "
           >
-            LET'S BUILD SOMETHING AMAZING
+            LET&apos;S BUILD SOMETHING AMAZING
           </p>
 
           <h2

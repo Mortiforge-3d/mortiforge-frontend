@@ -50,7 +50,7 @@ export default async function OrderDetailsPage({
 
               <div className="mt-12 space-y-8">
                 {/* Status */}
-                <section className="rounded-3xl border border-border bg-card/40 p-6 backdrop-blur md:p-8">
+                <section className="rounded-lg border border-border bg-card/40 p-6 backdrop-blur md:p-8">
                   <p className="body-font text-xs uppercase tracking-[0.2em] text-primary">
                     ORDER STATUS
                   </p>
@@ -86,7 +86,7 @@ export default async function OrderDetailsPage({
                 </section>
 
                 {/* Items */}
-                <section className="rounded-3xl border border-border bg-card/40 p-6 backdrop-blur md:p-8">
+                <section className="rounded-lg border border-border bg-card/40 p-6 backdrop-blur md:p-8">
                   <p className="body-font text-xs uppercase tracking-[0.2em] text-primary">
                     ORDER ITEMS
                   </p>
@@ -99,7 +99,7 @@ export default async function OrderDetailsPage({
                 </section>
 
                 {/* Shipping */}
-                <section className="rounded-3xl border border-border bg-card/40 p-6 backdrop-blur md:p-8">
+                <section className="rounded-lg border border-border bg-card/40 p-6 backdrop-blur md:p-8">
                   <p className="body-font text-xs uppercase tracking-[0.2em] text-primary">
                     SHIPPING ADDRESS
                   </p>
@@ -112,7 +112,7 @@ export default async function OrderDetailsPage({
                 </section>
 
                 {/* Payment */}
-                <section className="rounded-3xl border border-border bg-card/40 p-6 backdrop-blur md:p-8">
+                <section className="rounded-lg border border-border bg-card/40 p-6 backdrop-blur md:p-8">
                   <p className="body-font text-xs uppercase tracking-[0.2em] text-primary">
                     PAYMENT SUMMARY
                   </p>

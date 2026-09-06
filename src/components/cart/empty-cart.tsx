@@ -12,7 +12,7 @@ export default function EmptyCart() {
       </h2>
 
       <p className="mt-5 max-w-md body-font leading-relaxed text-muted-foreground">
-        Looks like you haven't added anything to your cart yet.
+        Looks like you haven&apos;t added anything to your cart yet.
         Explore our collection and find something worth printing.
       </p>
 

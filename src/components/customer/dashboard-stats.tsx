@@ -19,7 +19,7 @@ export default function DashboardStats() {
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="rounded-3xl border border-border bg-card/40 p-6 backdrop-blur"
+          className="rounded-lg border border-border bg-card/40 p-6 backdrop-blur"
         >
           <p className="body-font text-xs uppercase tracking-[0.2em] text-muted-foreground">
             {stat.label}

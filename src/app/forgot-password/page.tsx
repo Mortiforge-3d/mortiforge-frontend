@@ -9,7 +9,7 @@ export default function ForgotPasswordPage() {
       <Section className="min-h-[calc(100vh-8rem)] flex items-center pt-32 md:pt-36">
         <Container>
           <div className="mx-auto w-full max-w-xl">
-            <div className="rounded-3xl border border-border bg-card/40 p-8 backdrop-blur md:p-10">
+            <div className="rounded-lg border border-border bg-card/40 p-8 backdrop-blur md:p-10">
               <div className="mb-10">
                 <p className="body-font text-sm uppercase tracking-[0.35em] text-primary">
                   MORTIFORGE 3D
@@ -20,7 +20,7 @@ export default function ForgotPasswordPage() {
                 </h1>
 
                 <p className="mt-4 body-font leading-relaxed text-muted-foreground">
-                  Enter your email address and we'll send you a link to reset
+                  Enter your email address and we&apos;ll send you a link to reset
                   your password.
                 </p>
               </div>

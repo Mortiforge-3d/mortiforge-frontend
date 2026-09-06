@@ -80,7 +80,7 @@ export function FAQCTA() {
                 lg:text-7xl
               "
             >
-              Let's Start
+              Let&apos;s Start
               <br />A Conversation.
             </h2>
 
@@ -94,8 +94,8 @@ export function FAQCTA() {
                 text-muted-foreground
               "
             >
-              Whether you're planning a custom project, need advice on
-              materials, or have a question about an order, we're here to help.
+              Whether you&apos;re planning a custom project, need advice on
+                materials, or have a question about an order, we&apos;re here to help.
             </p>
 
             {/* Buttons */}

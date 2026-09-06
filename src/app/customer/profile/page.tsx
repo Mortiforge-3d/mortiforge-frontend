@@ -26,7 +26,7 @@ export default function CustomerProfilePage() {
                 </p>
               </div>
 
-              <div className="mt-12 rounded-3xl border border-border bg-card/40 p-6 backdrop-blur md:p-8">
+              <div className="mt-12 rounded-lg border border-border bg-card/40 p-6 backdrop-blur md:p-8">
                 <div className="mb-8">
                   <p className="body-font text-xs uppercase tracking-[0.2em] text-primary">
                     PERSONAL INFORMATION
@@ -88,7 +88,7 @@ export default function CustomerProfilePage() {
               </div>
 
               {/* Password */}
-              <div className="mt-8 rounded-3xl border border-border bg-card/40 p-6 backdrop-blur md:p-8">
+              <div className="mt-8 rounded-lg border border-border bg-card/40 p-6 backdrop-blur md:p-8">
                 <div className="mb-8">
                   <p className="body-font text-xs uppercase tracking-[0.2em] text-primary">
                     SECURITY

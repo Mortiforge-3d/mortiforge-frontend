@@ -1,6 +1,6 @@
 "use client";
 
-import { Float, Text } from "@react-three/drei";
+import { Float } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import { Edges } from "@react-three/drei";

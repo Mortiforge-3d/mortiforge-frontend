@@ -17,7 +17,7 @@ export default function CustomerPage() {
             <div className="space-y-8">
               <DashboardStats />
 
-              <section className="rounded-3xl border border-border bg-card/40 p-6 backdrop-blur md:p-8">
+              <section className="rounded-lg border border-border bg-card/40 p-6 backdrop-blur md:p-8">
                 <div>
                   <p className="body-font text-xs uppercase tracking-[0.2em] text-primary">
                     RECENT ACTIVITY
@@ -28,7 +28,7 @@ export default function CustomerPage() {
                   </h2>
                 </div>
 
-                <div className="mt-8 rounded-2xl border border-dashed border-border p-10 text-center">
+                <div className="mt-8 rounded-lg border border-dashed border-border p-10 text-center">
                   <p className="body-font text-sm text-muted-foreground">
                     Your recent orders will appear here.
                   </p>

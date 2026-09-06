@@ -30,7 +30,7 @@ export default function CustomerSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="rounded-3xl border border-border bg-card/40 p-4 backdrop-blur">
+    <aside className="rounded-lg border border-border bg-card/40 p-4 backdrop-blur">
       <nav className="space-y-1">
         {navigation.map((item) => {
           const active =

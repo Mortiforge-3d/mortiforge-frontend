@@ -81,8 +81,8 @@ export default function CustomPrintHero() {
                   text-muted-foreground
                 "
               >
-                Have an idea you'd like to bring to life? Tell us about your
-                project and we'll guide you through consultation, quotation,
+                Have an idea you&apos;d like to bring to life? Tell us about your
+                project and we&apos;ll guide you through consultation, quotation,
                 production, and delivery—keeping you informed every step of the
                 way.
               </p>

@@ -2,18 +2,18 @@
 
 import Link from "next/link";
 import { ShoppingBag, User } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 import { useCartStore } from "@/src/store/cart-store";
 
 export function NavbarActions() {
   const totalItems = useCartStore((state) => state.getTotalItems());
 
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
+  const hydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   return (
     <div className="flex items-center gap-3">

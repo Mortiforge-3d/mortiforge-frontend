@@ -82,7 +82,7 @@ export function AboutVision() {
     "
               >
                 Mortiforge exists to transform creative ideas into
-                premium-quality physical products. Whether it's a collectible,
+                premium-quality physical products. Whether it&apos;s a collectible,
                 desk accessory, prototype, or custom creation, every project
                 deserves precision and care.
               </p>

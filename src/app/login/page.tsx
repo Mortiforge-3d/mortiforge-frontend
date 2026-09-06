@@ -36,7 +36,7 @@ export default function LoginPage() {
 
             {/* Login Card */}
             <div className="mx-auto w-full max-w-xl">
-              <div className="rounded-3xl border border-border bg-card/40 p-8 backdrop-blur md:p-10">
+              <div className="rounded-lg border border-border bg-card/40 p-8 backdrop-blur md:p-10">
                 {/* Mobile Heading */}
                 <div className="mb-10 lg:hidden">
                   <p className="body-font text-sm uppercase tracking-[0.35em] text-primary">

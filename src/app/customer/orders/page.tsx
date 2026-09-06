@@ -27,13 +27,13 @@ export default function CustomerOrdersPage() {
               </div>
 
               {/* Empty State */}
-              <div className="mt-12 rounded-3xl border border-border bg-card/40 p-10 text-center backdrop-blur md:p-16">
+              <div className="mt-12 rounded-lg border border-border bg-card/40 p-10 text-center backdrop-blur md:p-16">
                 <p className="heading-font text-3xl uppercase md:text-4xl">
                   No Orders Yet
                 </p>
 
                 <p className="mx-auto mt-4 max-w-md body-font leading-relaxed text-muted-foreground">
-                  You haven't placed any orders yet. Explore our collection
+                  You haven&apos;t placed any orders yet. Explore our collection
                   and find something worth bringing to life.
                 </p>
 

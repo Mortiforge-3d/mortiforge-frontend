@@ -58,7 +58,7 @@ export default function CustomPrintForm() {
               text-muted-foreground
             "
           >
-            Tell us about your project and we'll review your
+            Tell us about your project and we&apos;ll review your
             requirements before preparing a personalized quotation.
           </p>
         </div>
@@ -72,7 +72,7 @@ export default function CustomPrintForm() {
           <form
             className="
               space-y-8
-              rounded-3xl
+              rounded-lg
               border
               border-border
               bg-card/40
@@ -233,7 +233,7 @@ export default function CustomPrintForm() {
 
           <div
             className="
-              rounded-3xl
+              rounded-lg
               border
               border-border
               bg-card/40
@@ -263,7 +263,7 @@ export default function CustomPrintForm() {
                 </h4>
 
                 <p className="mt-2 body-font text-muted-foreground">
-                  We'll discuss your requirements personally before production begins.
+                  We&apos;ll discuss your requirements personally before production begins.
                 </p>
               </div>
 
