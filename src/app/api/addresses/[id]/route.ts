@@ -134,21 +134,27 @@ export async function DELETE(
 
     const { id } = await params;
 
-    const address = await prisma.address.findFirst({
-      where: { id, userId },
-    });
-
-    if (!address) {
-      return NextResponse.json(
-        { error: "Address not found." },
-        { status: 404 },
-      );
-    }
-
-    await prisma.$transaction(async (tx) => {
-      await tx.address.delete({
-        where: { id },
+    const deleted = await prisma.$transaction(async (tx) => {
+      const address = await tx.address.findFirst({
+        where: { id, userId },
+        select: {
+          id: true,
+          isDefault: true,
+        },
       });
+
+      if (!address) {
+        return false;
+      }
+
+      // Enforce ownership again in the delete operation itself.
+      const result = await tx.address.deleteMany({
+        where: { id, userId },
+      });
+
+      if (result.count !== 1) {
+        return false;
+      }
 
       if (address.isDefault) {
         const replacement = await tx.address.findFirst({
@@ -163,7 +169,16 @@ export async function DELETE(
           });
         }
       }
+
+      return true;
     });
+
+    if (!deleted) {
+      return NextResponse.json(
+        { error: "Address not found." },
+        { status: 404 },
+      );
+    }
 
     return NextResponse.json({
       message: "Address deleted successfully.",

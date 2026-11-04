@@ -1,26 +1,71 @@
 import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
+import { auth } from "@/auth";
+import { prisma } from "@/src/lib/prisma";
 import { Container } from "@/src/components/layout/container";
 import { Section } from "@/src/components/layout/section";
 import AdminSidebar from "@/src/components/admin/admin-sidebar";
+import PrintRequestControls from "@/src/components/admin/requests/print-request-controls";
 
-const statuses = [
-  "Request Submitted",
-  "Under Review",
-  "Consultation",
-  "Quote Created",
-  "Awaiting Approval",
-  "Approved / Paid",
-  "In Production",
-  "Shipped",
-  "Completed",
-];
+const statusLabels = {
+  SUBMITTED: "Request Submitted",
+  CONTACTED: "Under Review",
+  DISCUSSING: "Consultation",
+  WAITING_FOR_CUSTOMER: "Awaiting Customer",
+  PRICE_FINALIZED: "Quote Created",
+  PAYMENT_PENDING: "Payment Pending",
+  PRINTING: "In Production",
+  COMPLETED: "Completed",
+  CLOSED: "Closed",
+} as const;
 
 export default async function AdminRequestDetailsPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const session = await auth();
+
+  if (!session?.user?.id) redirect("/login");
+
+  const admin = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { role: true },
+  });
+
+  if (admin?.role !== "ADMIN") redirect("/");
+
   const { id } = await params;
+
+  const request = await prisma.printRequest.findUnique({
+    where: { id },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+
+  if (!request) notFound();
+
+  const formattedDate = new Intl.DateTimeFormat("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(request.createdAt);
+
+  const projectTypes: Record<string, string> = {
+    prototype: "Prototype",
+    miniature: "Miniature",
+    decor: "Decor",
+    "functional-part": "Functional Part",
+    "replacement-part": "Replacement Part",
+    cosplay: "Cosplay",
+    other: "Other",
+  };
 
   return (
     <main>
@@ -30,16 +75,15 @@ export default async function AdminRequestDetailsPage({
             <AdminSidebar />
 
             <div>
-              {/* Header */}
-              <div>
-                <Link
-                  href="/admin/requests"
-                  className="body-font text-sm text-muted-foreground transition-colors hover:text-primary"
-                >
-                  ← Back to Requests
-                </Link>
+              <Link
+                href="/admin/requests"
+                className="body-font text-sm text-muted-foreground transition-colors hover:text-primary"
+              >
+                ← Back to Requests
+              </Link>
 
-                <p className="body-font mt-8 text-sm uppercase tracking-[0.35em] text-primary">
+              <div className="mt-8">
+                <p className="body-font text-sm uppercase tracking-[0.35em] text-primary">
                   CUSTOM PRINT
                 </p>
 
@@ -48,77 +92,35 @@ export default async function AdminRequestDetailsPage({
                 </h1>
 
                 <p className="mt-4 body-font text-sm text-muted-foreground">
-                  Request ID: {id}
+                  Request ID: {request.id}
                 </p>
               </div>
 
               <div className="mt-12 grid gap-8 xl:grid-cols-[1.3fr_0.7fr]">
-                {/* Main Content */}
                 <div className="space-y-8">
-                  {/* Status */}
                   <section className="rounded-lg border border-border bg-card/40 p-6 backdrop-blur md:p-8">
-                    <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-                      <div>
-                        <p className="body-font text-xs uppercase tracking-[0.2em] text-primary">
-                          PROJECT STATUS
-                        </p>
+                    <p className="body-font text-xs uppercase tracking-[0.2em] text-primary">
+                      PROJECT STATUS
+                    </p>
 
-                        <h2 className="heading-font mt-3 text-3xl uppercase">
-                          Workflow
-                        </h2>
-                      </div>
+                    <h2 className="heading-font mt-3 text-3xl uppercase">
+                      Workflow
+                    </h2>
 
-                      <select
-                        defaultValue="submitted"
-                        className="rounded-full border border-border bg-background px-5 py-3 body-font text-sm outline-none focus:border-primary"
-                      >
-                        <option value="submitted">Request Submitted</option>
-                        <option value="review">Under Review</option>
-                        <option value="consultation">Consultation</option>
-                        <option value="quote">Quote Created</option>
-                        <option value="approval">Awaiting Approval</option>
-                        <option value="paid">Approved / Paid</option>
-                        <option value="production">In Production</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="completed">Completed</option>
-                      </select>
-                    </div>
+                    <p className="mt-3 text-sm text-muted-foreground">
+                      Current status: {statusLabels[request.status]}
+                    </p>
 
-                    <button
-                      type="button"
-                      className="mt-6 rounded-full bg-primary px-6 py-3 body-font text-xs font-medium uppercase tracking-[0.2em] text-primary-foreground transition-opacity hover:opacity-90"
-                    >
-                      Update Status
-                    </button>
-
-                    <div className="mt-10 space-y-5">
-                      {statuses.map((status, index) => (
-                        <div key={status} className="flex items-center gap-4">
-                          <div
-                            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border ${
-                              index === 0
-                                ? "border-primary bg-primary text-primary-foreground"
-                                : "border-border text-muted-foreground"
-                            }`}
-                          >
-                            {index + 1}
-                          </div>
-
-                          <p
-                            className={`body-font text-sm ${
-                              index === 0
-                                ? "text-foreground"
-                                : "text-muted-foreground"
-                            }`}
-                          >
-                            {status}
-                          </p>
-                        </div>
-                      ))}
+                    <div className="mt-6">
+                      <PrintRequestControls
+                        requestId={request.id}
+                        initialStatus={request.status}
+                        initialNotes={request.adminNotes ?? ""}
+                        initialQuote={request.quotedPrice?.toString() ?? ""}
+                      />
                     </div>
                   </section>
 
-                  {/* Request Information */}
                   <section className="rounded-lg border border-border bg-card/40 p-6 backdrop-blur md:p-8">
                     <p className="body-font text-xs uppercase tracking-[0.2em] text-primary">
                       REQUEST INFORMATION
@@ -130,125 +132,57 @@ export default async function AdminRequestDetailsPage({
 
                     <div className="mt-8 grid gap-6 sm:grid-cols-2">
                       <div>
-                        <p className="body-font text-xs uppercase tracking-[0.15em] text-muted-foreground">
+                        <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground">
                           Project Title
                         </p>
-                        <p className="mt-2 body-font text-sm">—</p>
+                        <p className="mt-2 body-font text-sm">
+                          {request.title}
+                        </p>
                       </div>
 
                       <div>
-                        <p className="body-font text-xs uppercase tracking-[0.15em] text-muted-foreground">
+                        <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground">
                           Project Type
                         </p>
-                        <p className="mt-2 body-font text-sm">—</p>
+                        <p className="mt-2 body-font text-sm">
+                          {projectTypes[request.projectType] ??
+                            request.projectType}
+                        </p>
                       </div>
 
                       <div>
-                        <p className="body-font text-xs uppercase tracking-[0.15em] text-muted-foreground">
+                        <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground">
                           Quantity
                         </p>
-                        <p className="mt-2 body-font text-sm">—</p>
+                        <p className="mt-2 body-font text-sm">
+                          {request.quantity}
+                        </p>
                       </div>
 
                       <div>
-                        <p className="body-font text-xs uppercase tracking-[0.15em] text-muted-foreground">
+                        <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground">
                           Submitted
                         </p>
-                        <p className="mt-2 body-font text-sm">—</p>
+                        <p className="mt-2 body-font text-sm">
+                          {formattedDate}
+                        </p>
                       </div>
                     </div>
 
                     <div className="mt-8">
-                      <p className="body-font text-xs uppercase tracking-[0.15em] text-muted-foreground">
+                      <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground">
                         Description
                       </p>
 
-                      <div className="mt-3 rounded-2xl border border-dashed border-border p-6">
-                        <p className="body-font text-sm leading-relaxed text-muted-foreground">
-                          Customer project description will appear here.
+                      <div className="mt-3 whitespace-pre-wrap rounded-2xl border border-dashed border-border p-6">
+                        <p className="body-font text-sm leading-relaxed">
+                          {request.description}
                         </p>
                       </div>
                     </div>
                   </section>
-
-                  {/* Consultation */}
-                  <section className="rounded-lg border border-border bg-card/40 p-6 backdrop-blur md:p-8">
-                    <p className="body-font text-xs uppercase tracking-[0.2em] text-primary">
-                      CONSULTATION
-                    </p>
-
-                    <h2 className="heading-font mt-3 text-3xl uppercase">
-                      Project Notes
-                    </h2>
-
-                    <textarea
-                      placeholder="Add private notes about the consultation..."
-                      className="mt-6 min-h-32 w-full resize-y rounded-2xl border border-border bg-background px-5 py-4 body-font text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
-                    />
-
-                    <button
-                      type="button"
-                      className="mt-4 rounded-full border border-border px-6 py-3 body-font text-xs font-medium uppercase tracking-[0.2em] transition-colors hover:border-primary hover:text-primary"
-                    >
-                      Save Notes
-                    </button>
-                  </section>
-
-                  {/* Quote */}
-                  <section className="rounded-lg border border-border bg-card/40 p-6 backdrop-blur md:p-8">
-                    <p className="body-font text-xs uppercase tracking-[0.2em] text-primary">
-                      QUOTE
-                    </p>
-
-                    <h2 className="heading-font mt-3 text-3xl uppercase">
-                      Personalized Quote
-                    </h2>
-
-                    <div className="mt-8 grid gap-6 sm:grid-cols-2">
-                      <div>
-                        <label
-                          htmlFor="quoteAmount"
-                          className="body-font text-xs uppercase tracking-[0.15em] text-muted-foreground"
-                        >
-                          Quote Amount
-                        </label>
-
-                        <input
-                          id="quoteAmount"
-                          type="number"
-                          min="0"
-                          placeholder="₹0"
-                          className="mt-2 w-full rounded-2xl border border-border bg-background px-5 py-3 body-font text-sm outline-none focus:border-primary"
-                        />
-                      </div>
-
-                      <div>
-                        <label
-                          htmlFor="quoteNote"
-                          className="body-font text-xs uppercase tracking-[0.15em] text-muted-foreground"
-                        >
-                          Quote Note
-                        </label>
-
-                        <input
-                          id="quoteNote"
-                          type="text"
-                          placeholder="Optional note"
-                          className="mt-2 w-full rounded-2xl border border-border bg-background px-5 py-3 body-font text-sm outline-none focus:border-primary"
-                        />
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      className="mt-6 rounded-full bg-primary px-6 py-3 body-font text-xs font-medium uppercase tracking-[0.2em] text-primary-foreground transition-opacity hover:opacity-90"
-                    >
-                      Create Quote
-                    </button>
-                  </section>
                 </div>
 
-                {/* Customer */}
                 <aside className="space-y-8">
                   <section className="rounded-lg border border-border bg-card/40 p-6 backdrop-blur">
                     <p className="body-font text-xs uppercase tracking-[0.2em] text-primary">
@@ -260,35 +194,40 @@ export default async function AdminRequestDetailsPage({
                         <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground">
                           Name
                         </p>
-                        <p className="mt-1">—</p>
+                        <p className="mt-1">
+                          {request.user.name || "Not provided"}
+                        </p>
                       </div>
 
                       <div>
                         <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground">
                           Email
                         </p>
-                        <p className="mt-1">—</p>
-                      </div>
-
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground">
-                          Phone
-                        </p>
-                        <p className="mt-1">—</p>
+                        <a
+                          href={`mailto:${request.user.email}`}
+                          className="mt-1 inline-block break-all hover:text-primary"
+                        >
+                          {request.user.email}
+                        </a>
                       </div>
                     </div>
                   </section>
 
                   <section className="rounded-lg border border-border bg-card/40 p-6 backdrop-blur">
                     <p className="body-font text-xs uppercase tracking-[0.2em] text-primary">
-                      PROJECT FILES
+                      QUOTE
                     </p>
 
-                    <div className="mt-6 rounded-2xl border border-dashed border-border p-6 text-center">
-                      <p className="body-font text-sm text-muted-foreground">
-                        Files exchanged during consultation will appear here.
-                      </p>
-                    </div>
+                    <p className="heading-font mt-3 text-3xl">
+                      {request.quotedPrice !== null
+                        ? `₹${Number(request.quotedPrice).toLocaleString("en-IN")}`
+                        : "Not quoted"}
+                    </p>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {request.adminNotes
+                        ? "Private admin notes are saved."
+                        : "No private notes added yet."}
+                    </p>
                   </section>
                 </aside>
               </div>

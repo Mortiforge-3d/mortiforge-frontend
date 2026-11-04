@@ -1,9 +1,87 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
+import { prisma } from "@/src/lib/prisma";
 import { Container } from "@/src/components/layout/container";
 import { Section } from "@/src/components/layout/section";
 import AdminSidebar from "@/src/components/admin/admin-sidebar";
 
-export default function AdminOrdersPage() {
+const orderStatuses = [
+  "PENDING",
+  "CONFIRMED",
+  "PROCESSING",
+  "SHIPPED",
+  "DELIVERED",
+  "CANCELLED",
+] as const;
+
+const paymentLabels: Record<string, string> = {
+  PENDING: "Pending",
+  PAID: "Paid",
+  FAILED: "Failed",
+  REFUNDED: "Refunded",
+};
+
+export default async function AdminOrdersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; status?: string }>;
+}) {
+  const session = await auth();
+
+  if (!session?.user?.id) redirect("/login");
+
+  const admin = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { role: true },
+  });
+
+  if (admin?.role !== "ADMIN") redirect("/");
+
+  const params = await searchParams;
+  const query = params.q?.trim() ?? "";
+  const selectedStatus = orderStatuses.includes(
+    params.status as (typeof orderStatuses)[number],
+  )
+    ? params.status
+    : "";
+
+  const orders = await prisma.order.findMany({
+    where: {
+      ...(selectedStatus ? { status: selectedStatus as (typeof orderStatuses)[number] } : {}),
+      ...(query
+        ? {
+            OR: [
+              { orderNumber: { contains: query, mode: "insensitive" } },
+              {
+                user: {
+                  name: { contains: query, mode: "insensitive" },
+                },
+              },
+              {
+                user: {
+                  email: { contains: query, mode: "insensitive" },
+                },
+              },
+            ],
+          }
+        : {}),
+    },
+    include: {
+      user: {
+        select: { name: true, email: true },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 100,
+  });
+
+  const money = (value: { toString(): string }) =>
+    `₹${Number(value.toString()).toLocaleString("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+
   return (
     <main>
       <Section>
@@ -12,60 +90,127 @@ export default function AdminOrdersPage() {
             <AdminSidebar />
 
             <div>
-              {/* Header */}
-              <div>
-                <p className="body-font text-sm uppercase tracking-[0.35em] text-primary">
-                  ORDER MANAGEMENT
+              <div className="mb-8">
+                <p className="body-font text-xs uppercase tracking-[0.25em] text-primary">
+                  Admin / Orders
                 </p>
-
-                <h1 className="heading-font mt-4 text-5xl uppercase md:text-6xl">
-                  Orders
-                </h1>
-
-                <p className="mt-5 max-w-2xl body-font leading-relaxed text-muted-foreground">
-                  View and manage customer orders, payments, and fulfillment
-                  status.
+                <h1 className="heading-font mt-3 text-4xl">Orders</h1>
+                <p className="mt-2 body-font text-sm text-muted-foreground">
+                  Manage customer orders and fulfillment.
                 </p>
               </div>
 
-              {/* Filters */}
-              <div className="mt-10 flex flex-col gap-4 md:flex-row">
+              <form
+                method="GET"
+                className="mb-8 flex flex-col gap-3 sm:flex-row"
+              >
                 <input
                   type="search"
-                  placeholder="Search orders..."
-                  className="w-full rounded-full border border-border bg-card/40 px-5 py-3 body-font text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary md:max-w-sm"
+                  name="q"
+                  defaultValue={query}
+                  placeholder="Search order number, customer or email..."
+                  className="min-w-0 flex-1 rounded-full border border-border bg-background px-5 py-3 body-font text-sm outline-none focus:border-primary"
                 />
 
                 <select
-                  defaultValue="all"
-                  className="rounded-full border border-border bg-card/40 px-5 py-3 body-font text-sm outline-none focus:border-primary"
+                  name="status"
+                  defaultValue={selectedStatus}
+                  className="rounded-full border border-border bg-background px-5 py-3 body-font text-sm outline-none focus:border-primary"
                 >
-                  <option value="all">All Statuses</option>
-                  <option value="pending">Pending</option>
-                  <option value="processing">Processing</option>
-                  <option value="shipped">Shipped</option>
-                  <option value="delivered">Delivered</option>
-                  <option value="cancelled">Cancelled</option>
+                  <option value="">All statuses</option>
+                  {orderStatuses.map((status) => (
+                    <option key={status} value={status}>
+                      {status.replaceAll("_", " ")}
+                    </option>
+                  ))}
                 </select>
-              </div>
 
-              {/* Orders */}
-              <div className="mt-8 rounded-lg border border-border bg-card/40 p-10 text-center backdrop-blur md:p-16">
-                <p className="heading-font text-3xl uppercase md:text-4xl">
-                  No Orders Yet
-                </p>
-
-                <p className="mx-auto mt-4 max-w-md body-font leading-relaxed text-muted-foreground">
-                  Customer orders will appear here once purchases are made.
-                </p>
-
-                <Link
-                  href="/admin"
-                  className="mt-8 inline-flex rounded-full border border-border px-7 py-4 body-font text-sm font-medium uppercase tracking-[0.2em] transition-colors hover:border-primary hover:text-primary"
+                <button
+                  type="submit"
+                  className="rounded-full bg-primary px-7 py-3 body-font text-xs font-medium uppercase tracking-widest text-primary-foreground"
                 >
-                  Back to Dashboard
-                </Link>
-              </div>
+                  Search
+                </button>
+              </form>
+
+              <p className="mb-4 body-font text-sm text-muted-foreground">
+                {orders.length} order{orders.length === 1 ? "" : "s"} found
+                {orders.length === 100 ? " (showing latest 100)" : ""}
+              </p>
+
+              {orders.length === 0 ? (
+                <div className="rounded-2xl border border-border p-10 text-center">
+                  <h2 className="heading-font text-2xl">No orders found</h2>
+                  <p className="mt-2 body-font text-sm text-muted-foreground">
+                    Try changing your search or status filter.
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto rounded-2xl border border-border">
+                  <table className="w-full min-w-[750px] text-left">
+                    <thead className="border-b border-border bg-muted/30">
+                      <tr className="body-font text-xs uppercase tracking-wider text-muted-foreground">
+                        <th className="px-5 py-4">Order</th>
+                        <th className="px-5 py-4">Customer</th>
+                        <th className="px-5 py-4">Total</th>
+                        <th className="px-5 py-4">Payment</th>
+                        <th className="px-5 py-4">Status</th>
+                        <th className="px-5 py-4">Date</th>
+                        <th className="px-5 py-4">Action</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {orders.map((order) => (
+                        <tr
+                          key={order.id}
+                          className="border-b border-border last:border-0"
+                        >
+                          <td className="px-5 py-4 body-font text-sm font-medium">
+                            {order.orderNumber}
+                          </td>
+
+                          <td className="px-5 py-4">
+                            <p className="body-font text-sm">
+                              {order.user.name || "Customer"}
+                            </p>
+                            <p className="body-font text-xs text-muted-foreground">
+                              {order.user.email}
+                            </p>
+                          </td>
+
+                          <td className="px-5 py-4 body-font text-sm">
+                            {money(order.total)}
+                          </td>
+
+                          <td className="px-5 py-4 body-font text-xs">
+                            {paymentLabels[order.paymentStatus]}
+                          </td>
+
+                          <td className="px-5 py-4 body-font text-xs">
+                            {order.status.replaceAll("_", " ")}
+                          </td>
+
+                          <td className="px-5 py-4 body-font text-xs text-muted-foreground">
+                            {new Date(order.createdAt).toLocaleDateString(
+                              "en-IN",
+                            )}
+                          </td>
+
+                          <td className="px-5 py-4">
+                            <Link
+                              href={`/admin/orders/${order.id}`}
+                              className="body-font text-xs font-medium text-primary hover:underline"
+                            >
+                              View order →
+                            </Link>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         </Container>

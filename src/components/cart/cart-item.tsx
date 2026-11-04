@@ -1,73 +1,62 @@
+
 "use client";
 
 import Image from "next/image";
-import { CartItem as CartItemType, useCartStore } from "@/src/store/cart-store";
+import type { ApiCartItem } from "@/src/types/cart";
+import { useCartStore } from "@/src/store/cart-store";
 
 interface CartItemProps {
-  item: CartItemType;
+  item: ApiCartItem;
 }
 
 export default function CartItem({ item }: CartItemProps) {
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
-
-  const image = item.variant.images[0];
-  const total = item.product.price * item.quantity;
+  const product = item.variant.product;
+  const image = product.images[0];
+  const price = item.variant.price;
 
   return (
     <div className="flex flex-col gap-6 border-b border-border py-6 last:border-b-0 sm:flex-row">
-      {/* Image */}
-
       <div className="relative h-32 w-32 shrink-0 overflow-hidden rounded-xl border border-border bg-card">
-        <Image
-          src={image}
-          alt={item.product.title}
-          fill
-          className="object-cover"
-        />
+        {image ? (
+          <Image
+            src={image.imageUrl}
+            alt={image.altText || product.name}
+            fill
+            sizes="128px"
+            className="object-cover"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
+            No image
+          </div>
+        )}
       </div>
-
-      {/* Details */}
 
       <div className="flex flex-1 flex-col justify-between gap-5">
         <div>
           <p className="body-font text-xs uppercase tracking-[0.2em] text-primary">
-            {item.product.category}
+            {item.variant.color}
           </p>
 
           <h2 className="heading-font mt-2 text-2xl uppercase">
-            {item.product.title}
+            {product.name}
           </h2>
 
-          <div className="mt-3 space-y-1 body-font text-sm text-muted-foreground">
-            <p>
-              Color:{" "}
-              <span className="text-foreground">
-                {item.variant.color}
-              </span>
-            </p>
-
-            {item.customText && (
-              <p>
-                Custom Text:{" "}
-                <span className="text-foreground">
-                  {item.customText}
-                </span>
-              </p>
-            )}
-          </div>
+          <p className="mt-2 body-font text-sm text-muted-foreground">
+            ₹{price.toLocaleString("en-IN")} each
+          </p>
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-4">
-          {/* Quantity */}
-
           <div className="flex items-center gap-5 rounded-full border border-border px-5 py-2 body-font">
             <button
               type="button"
-              onClick={() =>
-                updateQuantity(item.id, Math.max(1, item.quantity - 1))
-              }
-              className="transition-colors hover:text-primary"
+              aria-label={`Decrease quantity of ${product.name}`}
+              disabled={item.quantity <= 1}
+              onClick={() => void updateQuantity(item.id, item.quantity - 1)}
+              className="transition-colors hover:text-primary disabled:opacity-40"
             >
               -
             </button>
@@ -76,20 +65,18 @@ export default function CartItem({ item }: CartItemProps) {
 
             <button
               type="button"
-              onClick={() =>
-                updateQuantity(item.id, item.quantity + 1)
-              }
-              className="transition-colors hover:text-primary"
+              aria-label={`Increase quantity of ${product.name}`}
+              disabled={item.quantity >= Math.min(item.variant.stock, 99)}
+              onClick={() => void updateQuantity(item.id, item.quantity + 1)}
+              className="transition-colors hover:text-primary disabled:opacity-40"
             >
               +
             </button>
           </div>
 
-          {/* Remove */}
-
           <button
             type="button"
-            onClick={() => removeItem(item.id)}
+            onClick={() => void removeItem(item.id)}
             className="body-font text-sm text-muted-foreground transition-colors hover:text-destructive"
           >
             Remove
@@ -97,18 +84,10 @@ export default function CartItem({ item }: CartItemProps) {
         </div>
       </div>
 
-      {/* Price */}
-
       <div className="shrink-0 sm:text-right">
         <p className="body-font text-lg font-semibold">
-          ₹{total}
+          ₹{item.lineTotal.toLocaleString("en-IN")}
         </p>
-
-        {item.quantity > 1 && (
-          <p className="mt-1 body-font text-xs text-muted-foreground">
-            ₹{item.product.price} each
-          </p>
-        )}
       </div>
     </div>
   );

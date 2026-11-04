@@ -1,118 +1,142 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import type { Product, ProductVariant } from "@/src/components/products/data";
 
-export type CartItem = {
-  id: string;
-  product: Product;
-  variant: ProductVariant;
-  quantity: number;
-  customText: string;
-};
+"use client";
+
+import { create } from "zustand";
+import type { ApiCartItem, ApiCartResponse } from "@/src/types/cart";
 
 type CartStore = {
- items: CartItem[];
+  items: ApiCartItem[];
+  isLoading: boolean;
+  error: string | null;
 
-  addItem: (
-    product: Product,
-    variant: ProductVariant,
-    quantity: number,
-    customText: string
-  ) => void;
-
-  removeItem: (id: string) => void;
-
-  updateQuantity: (id: string, quantity: number) => void;
-
+  loadCart: () => Promise<void>;
+  addItem: (productVariantId: string, quantity?: number) => Promise<void>;
+  removeItem: (id: string) => Promise<void>;
+  updateQuantity: (id: string, quantity: number) => Promise<void>;
   clearCart: () => void;
 
   getTotalItems: () => number;
-
   getSubtotal: () => number;
 };
 
-export const useCartStore = create<CartStore>()(
-  persist(
-    (set, get) => ({
-      items: [],
+async function readError(response: Response): Promise<string> {
+  try {
+    const data = (await response.json()) as { error?: string; message?: string };
+    return data.error || data.message || "Something went wrong.";
+  } catch {
+    return "Something went wrong.";
+  }
+}
 
-      addItem: (product, variant, quantity, customText) => {
-        const itemId = `${product.id}-${variant.color}-${customText.trim()}`;
+export const useCartStore = create<CartStore>()((set, get) => ({
+  items: [],
+  isLoading: false,
+  error: null,
 
-        set((state) => {
-          const existingItem = state.items.find(
-            (item) => item.id === itemId
-          );
+  loadCart: async () => {
+    set({ isLoading: true, error: null });
 
-          if (existingItem) {
-            return {
-              items: state.items.map((item) =>
-                item.id === itemId
-                  ? {
-                      ...item,
-                      quantity: item.quantity + quantity,
-                    }
-                  : item
-              ),
-            };
-          }
+    try {
+      const response = await fetch("/api/cart", {
+        method: "GET",
+        cache: "no-store",
+      });
 
-          return {
-            items: [
-              ...state.items,
-              {
-                id: itemId,
-                product,
-                variant,
-                quantity,
-                customText: customText.trim(),
-              },
-            ],
-          };
-        });
-      },
+      if (!response.ok) {
+        if (response.status === 401) {
+          set({ items: [], isLoading: false, error: "Sign in to view your cart." });
+          return;
+        }
 
-      removeItem: (id) => {
-        set((state) => ({
-          items: state.items.filter((item) => item.id !== id),
-        }));
-      },
+        throw new Error(await readError(response));
+      }
 
-      updateQuantity: (id, quantity) => {
-        if (quantity < 1) return;
-
-        set((state) => ({
-          items: state.items.map((item) =>
-            item.id === id
-              ? {
-                  ...item,
-                  quantity,
-                }
-              : item
-          ),
-        }));
-      },
-
-      clearCart: () => {
-        set({ items: [] });
-      },
-
-      getTotalItems: () => {
-        return get().items.reduce(
-          (total, item) => total + item.quantity,
-          0
-        );
-      },
-
-      getSubtotal: () => {
-        return get().items.reduce(
-          (total, item) => total + item.product.price * item.quantity,
-          0
-        );
-      },
-    }),
-    {
-      name: "mortiforge-cart",
+      const cart = (await response.json()) as ApiCartResponse;
+      set({ items: cart.items, isLoading: false, error: null });
+    } catch (error) {
+      set({
+        isLoading: false,
+        error: error instanceof Error ? error.message : "Unable to load cart.",
+      });
     }
-  )
-);
+  },
+
+  addItem: async (productVariantId, quantity = 1) => {
+    set({ error: null });
+
+    try {
+      const response = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productVariantId, quantity }),
+      });
+
+      if (!response.ok) {
+        throw new Error(await readError(response));
+      }
+
+      await get().loadCart();
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unable to add item to cart.";
+      set({ error: message });
+      throw error;
+    }
+  },
+
+  removeItem: async (id) => {
+    set({ error: null });
+
+    try {
+      const response = await fetch(`/api/cart/items/${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error(await readError(response));
+      }
+
+      await get().loadCart();
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unable to remove item.";
+      set({ error: message });
+      throw error;
+    }
+  },
+
+  updateQuantity: async (id, quantity) => {
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
+      return;
+    }
+
+    set({ error: null });
+
+    try {
+      const response = await fetch(`/api/cart/items/${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ quantity }),
+      });
+
+      if (!response.ok) {
+        throw new Error(await readError(response));
+      }
+
+      await get().loadCart();
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unable to update quantity.";
+      set({ error: message });
+      throw error;
+    }
+  },
+
+  clearCart: () => set({ items: [], error: null }),
+
+  getTotalItems: () =>
+    get().items.reduce((total, item) => total + item.quantity, 0),
+
+  getSubtotal: () =>
+    get().items.reduce((total, item) => total + item.lineTotal, 0),
+}));

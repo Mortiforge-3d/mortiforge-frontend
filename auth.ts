@@ -5,9 +5,11 @@ import bcrypt from "bcryptjs";
 import { prisma } from "./src/lib/prisma";
 import Google from "next-auth/providers/google";
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
 
+const adapter = PrismaAdapter(prisma);
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
+ adapter,
   session: {
     strategy: "jwt",
   },

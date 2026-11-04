@@ -1,7 +1,8 @@
-import { PRODUCTS } from "@/src/components/products/data";
+
+import { notFound } from "next/navigation";
+import { getProductBySlug, getProducts } from "@/src/lib/products";
 import { ProductDetails } from "@/src/components/products/product-details";
 import { RelatedProducts } from "@/src/components/products/related-products";
-import { notFound } from "next/navigation";
 
 export default async function ProductPage({
   params,
@@ -10,15 +11,21 @@ export default async function ProductPage({
 }) {
   const { slug } = await params;
 
-  const product = PRODUCTS.find((p) => p.slug === slug);
-
-  const relatedProducts = PRODUCTS.filter(
-    (p) => p.slug !== product?.slug
-  ).slice(0, 3);
+  const product = await getProductBySlug(slug);
 
   if (!product) {
     notFound();
   }
+
+  const { products } = await getProducts({
+    page: 1,
+    limit: 12,
+    category: product.category.slug,
+  });
+
+  const relatedProducts = products
+    .filter((item) => item.id !== product.id)
+    .slice(0, 3);
 
   return (
     <>

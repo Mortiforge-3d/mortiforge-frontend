@@ -7,6 +7,8 @@ import { Prisma } from "@prisma/client";
 
 import { verifyRazorpayWebhookSignature } from "../../../../../lib/razorpay-webhook-signature";
 
+import { recordPaymentReconciliation } from "../../../../../lib/payments/reconciliation";
+
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
@@ -132,6 +134,8 @@ export async function POST(request: Request) {
     );
   }
 
+    let reconciliationOrderId: string | null = null;
+
   try {
     await prisma.$transaction(async (tx) => {
       // Claim the event ID. Concurrent deliveries cannot both claim it.
@@ -151,6 +155,7 @@ export async function POST(request: Request) {
       if (!order) {
         throw new Error("LOCAL_ORDER_NOT_FOUND");
       }
+      reconciliationOrderId = order.id;
 
       const expectedAmount = new Prisma.Decimal(order.total)
         .mul(100)
@@ -241,41 +246,133 @@ if (order.paymentStatus === "PAID") {
     });
 
     return NextResponse.json({ received: true });
-  }
- catch (error) {
-  // A duplicate event ID may indicate a previously processed event.
-  if (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  ) {
-    try {
-      const existingEvent =
-        await prisma.razorpayWebhookEvent.findUnique({
-          where: { eventId },
-          select: { processed: true },
+    } catch (error) {
+    // Handle duplicate webhook deliveries.
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      try {
+        const existingEvent =
+          await prisma.razorpayWebhookEvent.findUnique({
+            where: { eventId },
+            select: { processed: true },
+          });
+
+        if (existingEvent?.processed) {
+          return NextResponse.json({ received: true });
+        }
+      } catch (lookupError) {
+        console.error("Duplicate webhook lookup failed:", {
+          eventId,
+          lookupError,
+        });
+      }
+    }
+
+    // Record captured payments that could not be fulfilled because
+    // inventory reservations were missing, expired, or unconsumable.
+    if (
+      error instanceof Error &&
+      [
+        "PAYMENT_REQUIRES_RECONCILIATION",
+        "RESERVATION_CONSUMPTION_FAILED",
+      ].includes(error.message)
+    ) {
+      try {
+        if (!reconciliationOrderId || !razorpayPaymentId) {
+          throw new Error("Missing order or payment ID for reconciliation.");
+        }
+
+        let reason:
+          | "RESERVATION_EXPIRED"
+          | "RESERVATION_MISSING"
+          | "RESERVATION_CONSUMPTION_FAILED"
+          | "PAYMENT_STATE_MISMATCH";
+
+        if (error.message === "RESERVATION_CONSUMPTION_FAILED") {
+          reason = "RESERVATION_CONSUMPTION_FAILED";
+        } else {
+          const currentReservations =
+            await prisma.inventoryReservation.findMany({
+              where: { orderId: reconciliationOrderId },
+              select: {
+                status: true,
+                expiresAt: true,
+              },
+            });
+
+          const now = new Date();
+
+          reason =
+            currentReservations.length === 0
+              ? "RESERVATION_MISSING"
+              : currentReservations.some(
+                    (reservation) =>
+                      reservation.status === "EXPIRED" ||
+                      reservation.expiresAt <= now
+                  )
+                ? "RESERVATION_EXPIRED"
+                : "PAYMENT_STATE_MISMATCH";
+        }
+
+        await recordPaymentReconciliation({
+          orderId: reconciliationOrderId,
+          razorpayPaymentId,
+          reason,
         });
 
-      if (existingEvent?.processed) {
-        return NextResponse.json({ received: true });
+        // The reconciliation record is now safely persisted.
+        // Acknowledge the webhook so Razorpay does not retry forever.
+        await prisma.razorpayWebhookEvent.upsert({
+          where: { eventId },
+          create: {
+            eventId,
+            eventType: event.event!,
+            processed: true,
+            processedAt: new Date(),
+          },
+          update: {
+            processed: true,
+            processedAt: new Date(),
+          },
+        });
+
+        console.error("Captured payment requires reconciliation:", {
+          eventId,
+          orderId: reconciliationOrderId,
+          razorpayPaymentId,
+          reason,
+        });
+
+        return NextResponse.json({
+          received: true,
+          reconciliationRequired: true,
+        });
+      } catch (reconciliationError) {
+        console.error("Webhook reconciliation failed:", {
+          eventId,
+          orderId: reconciliationOrderId,
+          razorpayPaymentId,
+          error: reconciliationError,
+        });
+
+        return NextResponse.json(
+          { error: "Payment reconciliation recording failed." },
+          { status: 500 }
+        );
       }
-    } catch (lookupError) {
-      console.error("Duplicate webhook lookup failed:", {
-        eventId,
-        lookupError,
-      });
     }
+
+    console.error("Razorpay webhook processing failed:", {
+      eventId,
+      eventType: event.event,
+      error,
+    });
+
+    return NextResponse.json(
+      { error: "Webhook processing failed." },
+      { status: 500 }
+    );
   }
-
-  console.error("Razorpay webhook processing failed:", {
-    eventId,
-    eventType: event.event,
-    error,
-  });
-
-  return NextResponse.json(
-    { error: "Webhook processing failed." },
-    { status: 500 }
-  );
-}
-
 }

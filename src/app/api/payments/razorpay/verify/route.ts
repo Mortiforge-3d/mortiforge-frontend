@@ -8,6 +8,7 @@ import { prisma } from "../../../../../lib/prisma";
 import { razorpay } from "../../../../../lib/razorpay";
 import { consumeReservation } from "../../../../../lib/inventory";
 import { Prisma } from "@prisma/client";
+import { recordPaymentReconciliation } from "../../../../../lib/payments/reconciliation";
 
 export const runtime = "nodejs";
 
@@ -145,7 +146,7 @@ export async function POST(request: Request) {
 
     const now = new Date();
 
-    if (
+        if (
       order.reservations.length === 0 ||
       order.reservations.some(
         (reservation) =>
@@ -153,16 +154,20 @@ export async function POST(request: Request) {
           reservation.expiresAt <= now
       )
     ) {
-      // The gateway captured money, but inventory is no longer safely
-      // reserved. Do not confirm the order; reconcile/refund this payment.
-      console.error(
-        "CAPTURED PAYMENT NEEDS RECONCILIATION",
-        {
-          orderId: order.id,
-          razorpayOrderId,
-          razorpayPaymentId,
-        }
-      );
+      const reason =
+        order.reservations.length === 0
+          ? "RESERVATION_MISSING"
+          : order.reservations.some(
+                (reservation) => reservation.expiresAt <= now
+              )
+            ? "RESERVATION_EXPIRED"
+            : "PAYMENT_STATE_MISMATCH";
+
+      await recordPaymentReconciliation({
+        orderId: order.id,
+        razorpayPaymentId,
+        reason,
+      });
 
       return NextResponse.json(
         {
@@ -175,7 +180,10 @@ export async function POST(request: Request) {
     }
 
 
-const transactionResult = await prisma.$transaction(async (tx) => {
+let transactionResult: "paid" | "already-paid";
+
+try {
+  transactionResult = await prisma.$transaction(async (tx) => {
   const currentOrder = await tx.order.findFirst({
     where: {
       id: order.id,
@@ -267,8 +275,55 @@ const transactionResult = await prisma.$transaction(async (tx) => {
     }
   }
 
-  return "paid" as const;
-});
+      return "paid" as const;
+  });
+} catch (error) {
+  if (
+    error instanceof Error &&
+    [
+      "RESERVATION_REQUIRES_RECONCILIATION",
+      "RESERVATION_CONSUMPTION_FAILED",
+    ].includes(error.message)
+  ) {
+    const currentReservations = await prisma.inventoryReservation.findMany({
+      where: { orderId: order.id },
+      select: {
+        status: true,
+        expiresAt: true,
+      },
+    });
+
+    const now = new Date();
+
+    const reason =
+      error.message === "RESERVATION_CONSUMPTION_FAILED"
+        ? "RESERVATION_CONSUMPTION_FAILED"
+        : currentReservations.length === 0
+          ? "RESERVATION_MISSING"
+          : currentReservations.some(
+                (reservation) => reservation.expiresAt <= now
+              )
+            ? "RESERVATION_EXPIRED"
+            : "PAYMENT_STATE_MISMATCH";
+
+    await recordPaymentReconciliation({
+      orderId: order.id,
+      razorpayPaymentId,
+      reason,
+    });
+
+    return NextResponse.json(
+      {
+        error:
+          "Payment was received, but inventory needs reconciliation. Please contact support and quote your order number.",
+        orderNumber: order.orderNumber,
+      },
+      { status: 409 }
+    );
+  }
+
+  throw error;
+}
 
 
     return NextResponse.json({

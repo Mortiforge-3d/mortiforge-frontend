@@ -9,6 +9,8 @@ const mocks = vi.hoisted(() => ({
   fetchPayment: vi.fn(),
   verifySignature: vi.fn(),
   consumeReservation: vi.fn(),
+  recordReconciliation: vi.fn(),
+  findReservations: vi.fn(),
 
   txFindFirst: vi.fn(),
   txUpdateMany: vi.fn(),
@@ -27,6 +29,9 @@ vi.mock("../../../../../lib/prisma", () => ({
   prisma: {
     order: {
       findFirst: mocks.findFirst,
+    },
+    inventoryReservation: {
+      findMany: mocks.findReservations,
     },
     $transaction: mocks.transaction,
   },
@@ -47,6 +52,10 @@ vi.mock("../../../../../lib/razorpay-signature", () => ({
 
 vi.mock("../../../../../lib/inventory", () => ({
   consumeReservation: mocks.consumeReservation,
+}));
+
+vi.mock("../../../../../lib/payments/reconciliation", () => ({
+  recordPaymentReconciliation: mocks.recordReconciliation,
 }));
 
 import { POST } from "./route";
@@ -80,6 +89,9 @@ beforeEach(() => {
   });
 
   mocks.verifySignature.mockReturnValue(true);
+
+  mocks.recordReconciliation.mockResolvedValue({});
+  mocks.findReservations.mockResolvedValue([]);
 
   mocks.transaction.mockImplementation(
     async (callback: (tx: unknown) => Promise<unknown>) =>
@@ -473,7 +485,7 @@ it("confirms the order and consumes its reservation in a transaction", async () 
 });
 
 
-it("fails verification when reservation consumption fails", async () => {
+it("records reconciliation when reservation consumption fails", async () => {
   const reservation = {
     id: "reservation_001",
     status: "ACTIVE",
@@ -515,19 +527,26 @@ it("fails verification when reservation consumption fails", async () => {
   const response = await POST(makeRequest(validBody));
   const data = await response.json();
 
-  expect(response.status).toBe(500);
-  expect(data.error).toBe(
-    "Unable to verify payment. Please contact support if money was deducted."
-  );
+  expect(response.status).toBe(409);
+  expect(data.error).toContain("Payment was received");
+  expect(data.orderNumber).toBe("MF-001");
 
   expect(mocks.transaction).toHaveBeenCalledOnce();
   expect(mocks.txUpdateMany).toHaveBeenCalledOnce();
+
   expect(mocks.consumeReservation).toHaveBeenCalledWith(
     expect.any(Object),
     "reservation_001"
   );
-});
 
+  expect(mocks.findReservations).toHaveBeenCalledOnce();
+
+  expect(mocks.recordReconciliation).toHaveBeenCalledWith({
+    orderId: "local_order_001",
+    razorpayPaymentId: validBody.razorpay_payment_id,
+    reason: "RESERVATION_CONSUMPTION_FAILED",
+  });
+});
 
 it("rejects confirmation when the pending-order update loses a race", async () => {
   const reservation = {

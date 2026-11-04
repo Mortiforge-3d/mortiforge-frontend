@@ -1,5 +1,7 @@
+
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 
 import { Container } from "@/src/components/layout/container";
@@ -11,6 +13,57 @@ import { useCartStore } from "@/src/store/cart-store";
 
 export default function CheckoutPage() {
   const items = useCartStore((state) => state.items);
+  const isLoading = useCartStore((state) => state.isLoading);
+  const error = useCartStore((state) => state.error);
+  const loadCart = useCartStore((state) => state.loadCart);
+
+  useEffect(() => {
+    void loadCart();
+  }, [loadCart]);
+
+  if (isLoading) {
+    return (
+      <main>
+        <Section className="pt-32 md:pt-36">
+          <Container>
+            <p className="body-font text-sm text-muted-foreground">
+              Loading your cart...
+            </p>
+          </Container>
+        </Section>
+      </main>
+    );
+  }
+
+  if (error && items.length === 0) {
+    return (
+      <main>
+        <Section className="pt-32 md:pt-36">
+          <Container>
+            <div className="max-w-3xl">
+              <p className="body-font text-sm uppercase tracking-[0.35em] text-primary">
+                CHECKOUT
+              </p>
+
+              <h1 className="heading-font mt-4 text-5xl uppercase lg:text-7xl">
+                Checkout
+              </h1>
+
+              <p className="mt-6 text-muted-foreground">{error}</p>
+
+              <button
+                type="button"
+                onClick={() => void loadCart()}
+                className="mt-6 rounded-full border border-border px-6 py-3 text-sm transition-colors hover:border-primary hover:text-primary"
+              >
+                Try Again
+              </button>
+            </div>
+          </Container>
+        </Section>
+      </main>
+    );
+  }
 
   if (items.length === 0) {
     return (
@@ -40,8 +93,6 @@ export default function CheckoutPage() {
     <main>
       <Section className="pt-32 md:pt-36">
         <Container>
-          {/* Header */}
-
           <div className="max-w-3xl">
             <p className="body-font text-sm uppercase tracking-[0.35em] text-primary">
               COMPLETE YOUR ORDER
@@ -52,37 +103,22 @@ export default function CheckoutPage() {
             </h1>
 
             <p className="mt-6 body-font leading-relaxed text-muted-foreground">
-              Enter your details and shipping information to continue
-              with your order.
+              Enter your details and shipping information to continue with your
+              order.
             </p>
           </div>
 
-          {/* Checkout */}
-
           <div className="mt-16 grid items-start gap-12 lg:grid-cols-[1.6fr_1fr]">
-            {/* Form */}
-
             <div className="rounded-3xl border border-border bg-card/40 p-8 backdrop-blur md:p-10">
               <CheckoutForm />
             </div>
-
-            {/* Summary */}
 
             <div className="lg:sticky lg:top-32">
               <CheckoutSummary />
 
               <Link
                 href="/cart"
-                className="
-                  mt-4
-                  block
-                  text-center
-                  body-font
-                  text-sm
-                  text-muted-foreground
-                  transition-colors
-                  hover:text-primary
-                "
+                className="mt-4 block text-center body-font text-sm text-muted-foreground transition-colors hover:text-primary"
               >
                 ← Back to Cart
               </Link>

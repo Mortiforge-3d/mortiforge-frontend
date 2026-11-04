@@ -1,334 +1,284 @@
+
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 import { Section } from "../layout/section";
 import { Container } from "../layout/container";
-import { useState } from "react";
 import { useCartStore } from "@/src/store/cart-store";
-import type { Product} from "@/src/components/products/data";
+import type { ApiProductDetail } from "@/src/types/product";
 
 interface ProductDetailsProps {
-  product: Product;
+  product: ApiProductDetail;
 }
 
+const COLOR_HEX: Record<string, string> = {
+  black: "#171717",
+  white: "#f5f5f5",
+  red: "#ef4444",
+  blue: "#3b82f6",
+  green: "#22c55e",
+  yellow: "#eab308",
+  orange: "#f97316",
+  purple: "#a855f7",
+  violet: "#8b5cf6",
+  pink: "#ec4899",
+  gray: "#6b7280",
+  grey: "#6b7280",
+};
+
 export function ProductDetails({ product }: ProductDetailsProps) {
-  const [selectedColor, setSelectedColor] = useState(product.variants[0].color);
+  const [selectedVariantId, setSelectedVariantId] = useState(
+    product.variants[0]?.id ?? "",
+  );
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [customText, setCustomText] = useState("");
+  const [cartMessage, setCartMessage] = useState<string | null>(null);
+  const [isAdding, setIsAdding] = useState(false);
+
   const addItem = useCartStore((state) => state.addItem);
+  const cartError = useCartStore((state) => state.error);
 
   const selectedVariant = product.variants.find(
-    (variants) => variants.color === selectedColor,
-  )!;
+    (variant) => variant.id === selectedVariantId,
+  );
+
+  const images = product.images;
+  const currentImage = images[selectedImage] ?? images[0];
+  const stock = selectedVariant?.stock ?? 0;
+  const price = selectedVariant ? Number(selectedVariant.price) : null;
+  const canPurchase = Boolean(selectedVariant && stock > 0);
+
+  async function handleAddToCart() {
+    if (!selectedVariant || !canPurchase || isAdding) return;
+
+    setIsAdding(true);
+    setCartMessage(null);
+
+    try {
+      await addItem(selectedVariant.id, quantity);
+      setCartMessage("Added to your cart.");
+    } catch {
+      // The cart store records the API error.
+    } finally {
+      setIsAdding(false);
+    }
+  }
+
   return (
     <Section>
       <Container>
         <div className="grid items-start gap-8 md:grid-cols-2">
+          {/* Product images */}
           <div className="flex gap-4">
-            {/* Thumbnails */}
+            {images.length > 1 && (
+              <div className="flex flex-col gap-4">
+                {images.map((image, index) => (
+                  <button
+                    key={`${image.imageUrl}-${index}`}
+                    type="button"
+                    onClick={() => setSelectedImage(index)}
+                    aria-label={`View product image ${index + 1}`}
+                    className={`overflow-hidden rounded-sm border transition-all hover:border-primary ${
+                      selectedImage === index
+                        ? "border-primary"
+                        : "border-border"
+                    }`}
+                  >
+                    <Image
+                      src={image.imageUrl}
+                      alt={image.altText || product.name}
+                      width={64}
+                      height={64}
+                      className="h-16 w-16 object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
 
-            <div className="flex flex-col gap-6">
-              {selectedVariant.images.map((image, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedImage(index)}
-                  className={`
-                    overflow-hidden
-        rounded-sm
-        border
-        border-border
-        transition-all
-        hover:border-primary
-        ${selectedImage === index ? "border-primary" : "border-border"}
-        
-      `}
-                >
-                  <Image src={image} alt="" width={50} height={50} />
-                </button>
-              ))}
-            </div>
-
-            {/* Main Image */}
-            <div
-              className="
-    flex
-    justify-center
-    overflow-hidden
-    rounded-md
-    border
-    border-primary/20
-    bg-card
-  "
-            >
-              <Image
-                src={selectedVariant.images[selectedImage]}
-                alt={product.title}
-                width={450}
-                height={450}
-              />
+            <div className="relative flex min-h-[320px] flex-1 items-center justify-center overflow-hidden rounded-md border border-primary/20 bg-card">
+              {currentImage ? (
+                <Image
+                  src={currentImage.imageUrl}
+                  alt={currentImage.altText || product.name}
+                  width={600}
+                  height={600}
+                  priority
+                  className="h-auto max-h-[600px] w-full object-contain"
+                />
+              ) : (
+                <p className="p-8 text-sm text-muted-foreground">
+                  Images coming soon
+                </p>
+              )}
             </div>
           </div>
 
-          {/* Content */}
+          {/* Product details */}
           <div className="flex flex-col justify-center">
-            {/* Category */}
-            <p
-              className="
-    text-sm
-    uppercase
-    tracking-[0.4em]
-    text-primary
-    body-font
-  "
-            >
-              {product.category}
+            <p className="body-font text-sm uppercase tracking-[0.4em] text-primary">
+              {product.category.name}
             </p>
 
-            {/* Product Name */}
-            <h1
-              className="
-    heading-font
-    mt-3
-    text-4xl
-    md:text-5xl
-    uppercase
-    leading-none
-  "
-            >
-              {product.title}
+            <h1 className="heading-font mt-3 text-4xl uppercase leading-none md:text-5xl">
+              {product.name}
             </h1>
 
-            {/* Price */}
-            <p
-              className="
-    mt-6
-    text-4xl
-    font-bold
-    text-primary
-    body-font
-  "
-            >
-              ₹{product.price}
+            {product.shortDescription && (
+              <p className="mt-4 body-font leading-relaxed text-muted-foreground">
+                {product.shortDescription}
+              </p>
+            )}
+
+            <p className="body-font mt-6 text-4xl font-bold text-primary">
+              {price !== null
+                ? `₹${price.toLocaleString("en-IN")}`
+                : "Unavailable"}
             </p>
 
-            {/* Specifications */}
-            <div
-              className="
-    mt-8
-    rounded-lg
-    border
-    
-    bg-card
-    p-4
-  "
-            >
+            <div className="mt-8 rounded-lg border border-border bg-card p-4">
               <div className="grid gap-6 body-font">
-                <div className="flex justify-between">
-                  <span>Material</span>
-
-                  <span>{product.materials}</span>
+                <div className="flex justify-between gap-4">
+                  <span className="text-muted-foreground">Material</span>
+                  <span>{product.material || "Not specified"}</span>
                 </div>
 
-                <div className="flex justify-between">
-                  <span>Color</span>
-
-                  <span>{selectedColor}</span>
+                <div className="flex justify-between gap-4">
+                  <span className="text-muted-foreground">Color</span>
+                  <span>{selectedVariant?.color ?? "Unavailable"}</span>
                 </div>
 
-                <div className="flex justify-between">
-                  <span>Dimensions</span>
+                <div className="flex justify-between gap-4">
+                  <span className="text-muted-foreground">Dimensions</span>
+                  <span>{product.dimensions || "Not specified"}</span>
+                </div>
 
-                  <span>{product.dimensions}</span>
+                <div className="flex justify-between gap-4">
+                  <span className="text-muted-foreground">Availability</span>
+                  <span className={stock > 0 ? "text-primary" : "text-destructive"}>
+                    {stock > 0 ? `${stock} available` : "Out of stock"}
+                  </span>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              {/* Quantity */}
-              <div className="mt-8 body-font">
-                <p className="mb-4 text-sm uppercase text-primary  tracking-[0.15em]">
-                  Quantity
-                </p>
+            {/* Quantity */}
+            <div className="mt-8 body-font">
+              <p className="mb-4 text-sm uppercase tracking-[0.15em] text-primary">
+                Quantity
+              </p>
 
-                <div
-                  className="
-      flex
-      w-fit
-      items-center
-      gap-8
-      rounded-full
-      border
-      border-border
-      px-8
-      py-3
-    "
+              <div className="flex w-fit items-center gap-8 rounded-full border border-border px-8 py-3">
+                <button
+                  type="button"
+                  aria-label="Decrease quantity"
+                  disabled={quantity <= 1}
+                  onClick={() => setQuantity((value) => Math.max(1, value - 1))}
+                  className="disabled:opacity-40"
                 >
-                  <button
-                    onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                  >
-                    -
-                  </button>
-                  <span>{quantity}</span>
-                  {/* <button onClick={() => setQuantity((prev) => prev + 1)}>
-                    +
-                  </button> */}
-                  <button
-  onClick={() => {
-    console.log("PLUS CLICKED");
-    setQuantity((prev) => prev + 1);
-  }}
->
-  +
-</button>
-                </div>
+                  -
+                </button>
+
+                <span>{quantity}</span>
+
+                <button
+                  type="button"
+                  aria-label="Increase quantity"
+                  disabled={!canPurchase || quantity >= Math.min(stock, 99)}
+                  onClick={() =>
+                    setQuantity((value) => Math.min(Math.min(stock, 99), value + 1))
+                  }
+                  className="disabled:opacity-40"
+                >
+                  +
+                </button>
               </div>
+            </div>
 
-              {/* colors */}
-
-              <div className="mt-8 space-y-3 lg:justify-self-end">
-                <p
-                  className="
-      text-sm
-      uppercase
-      tracking-[0.15em]
-      text-primary
-      body-font
-      mb-5
-    "
-                >
+            {/* Variant selector */}
+            {product.variants.length > 0 && (
+              <div className="mt-8 space-y-3">
+                <p className="body-font mb-5 text-sm uppercase tracking-[0.15em] text-primary">
                   Color
                 </p>
 
-                <div className="flex gap-3">
-                  {product.variants.map((variant) => (
-                    <button
-                      key={variant.color}
-                      onClick={() => {
-                        setSelectedColor(variant.color);
-                        setSelectedImage(0);
-                      }}
-                      style={{
-                        backgroundColor: variant.hex,
-                      }}
-                      className={`
-          h-10
-          w-10
-          rounded-full
-          border-2
-          transition-all
-          ${
-            selectedColor === variant.color
-              ? "border-primary scale-110"
-              : "border-border"
-          }
-        `}
-                    />
-                  ))}
+                <div className="flex flex-wrap gap-3">
+                  {product.variants.map((variant) => {
+                    const colorKey = variant.color.trim().toLowerCase();
+                    const hex = COLOR_HEX[colorKey] ?? "#8b5cf6";
+
+                    return (
+                      <button
+                        key={variant.id}
+                        type="button"
+                        title={`${variant.color}${variant.stock === 0 ? " — out of stock" : ""}`}
+                        aria-label={`Select ${variant.color}`}
+                        aria-pressed={selectedVariantId === variant.id}
+                        disabled={variant.stock <= 0}
+                        onClick={() => {
+                          setSelectedVariantId(variant.id);
+                          setSelectedImage(0);
+                          setQuantity(1);
+                          setCartMessage(null);
+                        }}
+                        style={{ backgroundColor: hex }}
+                        className={`h-10 w-10 rounded-full border-2 transition-all disabled:cursor-not-allowed disabled:opacity-30 ${
+                          selectedVariantId === variant.id
+                            ? "scale-110 border-primary"
+                            : "border-border"
+                        }`}
+                      />
+                    );
+                  })}
                 </div>
               </div>
-            </div>
+            )}
 
-            <div className="mt-8">
-              <p
-                className="
-      text-sm
-      uppercase
-      tracking-[0.15em]
-      text-primary
-      body-font
-    "
-              >
-                Custom Engraving
-              </p>
-
-              <p
-                className="
-      mt-2
-      text-sm
-      text-muted-foreground
-      body-font
-    "
-              >
-                Add a name, quote, or short message to personalize your print.
-                Additional charges may apply. Leave blank if not required.
-              </p>
-
-              <textarea
-                value={customText}
-                onChange={(e) => setCustomText(e.target.value)}
-                maxLength={25}
-                placeholder="Enter text here..."
-                className="
-      mt-4
-      min-h-[120px]
-      w-full
-      rounded-lg
-      border
-      border-border
-      bg-card
-      p-4
-      body-font
-      outline-none
-      transition-colors
-      focus:border-primary
-    "
-              />
-
-              <p
-                className="
-      mt-2
-      text-xs
-      text-muted-foreground
-      text-right
-    "
-              >
-                {customText.length}/25 characters
-              </p>
-            </div>
-
-            {/* Actions */}
-            <div className="mt-10 flex gap-4">
+            {/* Cart action */}
+            <div className="mt-10">
               <button
-              onClick={() =>
-  addItem(product, selectedVariant, quantity, customText)
-}
-                className="
-      flex-1
-      rounded-full
-      bg-primary
-      px-8
-      py-4
-      font-semibold
-      text-black
-      transition-all
-      hover:scale-[1.02]
-      body-font
-    "
+                type="button"
+                onClick={handleAddToCart}
+                disabled={!canPurchase || isAdding || quantity > stock}
+                className="w-full rounded-full bg-primary px-8 py-4 font-semibold text-primary-foreground transition-all hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Add To Cart
+                {isAdding
+                  ? "Adding..."
+                  : !canPurchase
+                    ? "Out of Stock"
+                    : "Add To Cart"}
               </button>
 
-              <button
-                className="
-      flex-1
-      rounded-full
-      border
-      border-primary
-      px-8
-      py-4
-      font-semibold
-      transition-all
-      hover:bg-primary/10
-      bg-card
-      body-font
-    "
-              >
-                Buy Now
-              </button>
+              {cartMessage && (
+                <p role="status" className="mt-3 text-sm text-primary">
+                  {cartMessage}
+                </p>
+              )}
+
+              {cartError && (
+                <p role="alert" className="mt-3 text-sm text-destructive">
+                  {cartError}
+                </p>
+              )}
+
+              <p className="mt-3 text-xs text-muted-foreground">
+                You must sign in to add products to your cart.
+              </p>
             </div>
           </div>
         </div>
+
+        {product.description && (
+          <div className="mt-16 max-w-3xl">
+            <h2 className="heading-font text-3xl uppercase">
+              About This Print
+            </h2>
+            <p className="mt-4 whitespace-pre-line leading-relaxed text-muted-foreground">
+              {product.description}
+            </p>
+          </div>
+        )}
       </Container>
     </Section>
   );
