@@ -1,4 +1,3 @@
-
 import type { NextConfig } from "next";
 
 const securityHeaders = [
@@ -23,6 +22,7 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   experimental: {
     turbopackFileSystemCacheForDev: true,
+    cpus: 2,
   },
 
   images: {
