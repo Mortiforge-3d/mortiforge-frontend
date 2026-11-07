@@ -1,23 +1,18 @@
+
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { Container } from "@/src/components/layout/container";
 import { Section } from "@/src/components/layout/section";
 import AdminSidebar from "@/src/components/admin/admin-sidebar";
 import ProductForm from "@/src/components/admin/product-form";
-import { PRODUCTS } from "@/src/components/products/data";
+
+type EditProductPageProps = {
+  params: Promise<{ id: string }>;
+};
 
 export default async function EditProductPage({
   params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+}: EditProductPageProps) {
   const { id } = await params;
-
-  const product = PRODUCTS.find((item) => item.id === id);
-
-  if (!product) {
-    notFound();
-  }
 
   return (
     <main>
@@ -49,7 +44,7 @@ export default async function EditProductPage({
               </div>
 
               <div className="mt-12 rounded-lg border border-border bg-card/40 p-6 backdrop-blur md:p-10">
-                <ProductForm />
+                <ProductForm productId={id} />
               </div>
             </div>
           </div>
